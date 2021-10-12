@@ -96,6 +96,16 @@ ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
 
 ftx_trades <- function(key, secret, market, ...) {
   # GET /markets/{market}/trades
+  path = paste0('/api/markets/', market, '/trades')
+  response = ftx_send_request(method = "GET", path = path, key, secret)
+  result = response$result
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_historical_prices <- function(key, secret, market, resolution, start_time, end_time, ...) {
