@@ -272,7 +272,7 @@ ftx_modify_order <- function(key, secret, order_id, size, price, ...) {
 ftx_order_status <- function(key, secret, order_id, ...) {
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/by_client_id/', order_id)
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   
   df <- response %>%
     tibble::as_tibble()
@@ -284,6 +284,7 @@ ftx_cancel_order <- function(key, secret, order_id, ...) {
 
 ftx_order_fills <- function(key, secret, market, ...) {
   # GET /fills?market={market} 
+  
 }
 
 ftx_funding_payments <-  function(key, secret, ...) {
@@ -300,5 +301,13 @@ ftx_spot_margin_borrow_rates <- function(key, secret, ...) {
 
 ftx_my_spot_borrow_history <- function(key, secret, ...) {
   # GET /spot_margin/borrow_history
+  response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, ...)
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = response), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
