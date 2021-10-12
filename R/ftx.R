@@ -237,11 +237,25 @@ ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time,
   ))
 }
 
-ftx_open_orders <- function(key, secret, market...) {
+ftx_open_orders <- function(key, secret, market, ...) {
   # GET /orders?market={market}
+  path = paste0('/api/orders')
+  if(!missing(market)){
+    path = paste0(path, '?market=', market)
+  }
+  
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  result = response$result
+  
+  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
-ftx_orders_history <- function(key, secret, market...) {
+ftx_orders_history <- function(key, secret, market, ...) {
   # GET /orders/history?market={market}
 }
 
@@ -257,6 +271,11 @@ ftx_modify_order <- function(key, secret, order_id, size, price, ...) {
 
 ftx_order_status <- function(key, secret, order_id, ...) {
   # GET /orders/by_client_id/{client_order_id}
+  path = paste0('/api/orders/by_client_id/', order_id)
+  response = ftx_send_request(method = "GET", path = path, key, secret)
+  
+  df <- response %>%
+    tibble::as_tibble()
 }
 
 ftx_cancel_order <- function(key, secret, order_id, ...) {
