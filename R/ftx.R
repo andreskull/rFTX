@@ -4,6 +4,7 @@ library(lubridate)
 library(stringi)
 library(assert)
 library(logging)
+library(httr)
 
 base_url <- "https://ftx.com"
 
