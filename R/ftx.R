@@ -81,6 +81,9 @@ ftx_coin_markets <- function(key, secret, ...) {
 
 ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
+  # depth parameter check
+  if(depth > 100) logerror(msg = 'Depth value is too large.')
+  
   path = paste0('/api/markets/', market, '/orderbook?', depth)
   response = ftx_send_request(method = "GET", path = path, key, secret)
   result = response$result
