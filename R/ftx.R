@@ -68,6 +68,15 @@ ftx_positions <- function(key, secret, ...) {
 
 ftx_coin_markets <- function(key, secret, ...) {
   # GET /markets
+  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret)
+  result = response$result
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
