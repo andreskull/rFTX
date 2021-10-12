@@ -171,6 +171,12 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
       tibble::as_tibble()
   }
   ))
+  
+  if(!is.na(market) & length(market) == 1){
+    df <- result %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
 }
 
 ftx_future_stat <-  function(key, secret, market, ...) {
