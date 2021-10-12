@@ -297,6 +297,14 @@ ftx_spot_lending_history <- function(key, secret, ...) {
 
 ftx_spot_margin_borrow_rates <- function(key, secret, ...) {
   # GET /spot_margin/borrow_rates
+  response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_rates', key, secret, ...)
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = response), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_my_spot_borrow_history <- function(key, secret, ...) {
