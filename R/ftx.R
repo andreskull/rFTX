@@ -143,14 +143,10 @@ ftx_historical_prices <- function(key, secret, market, resolution, start_time, e
   path = paste0('/api/markets/', market, '/candles?resolution=', resolution)
   
   if(!missing(start_time)){
-    path = paste0(path, '?start_time=', start_time)
+    path = paste0(path, '&start_time=', start_time)
   }
   if(!missing(end_time)){
-    if(missing(start_time)){
-      path = paste0(path, '?end_time=', end_time)
-    } else {
-      path = paste0(path, '&?end_time=', end_time)
-    }
+    path = paste0(path, '&end_time=', end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
@@ -202,9 +198,43 @@ ftx_future_stat <-  function(key, secret, market, ...) {
     tibble::as_tibble()
 }
 
-ftx_future_funding_rates <-  function(key, secret, ...) {
+ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time, ...) {
   # GET /funding_rates
+  # checks on start and end times
+  if(!missing(start_time) & !missing(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
   
+  path = '/api/funding_rates'
+  if(!missing(market)){
+    path = paste0(path, '?future=', market)
+  }
+  if(!missing(start_time)){
+    if(missing(market)){
+      path = paste0(path, '?start_time=', start_time)
+    } else {
+      path = paste0(path, '&?start_time=', start_time)
+    }
+  }
+  if(!missing(end_time)){
+    if(missing(start_time)){
+      path = paste0(path, '?end_time=', end_time)
+    } else {
+      path = paste0(path, '&?end_time=', end_time)
+    }
+  }
+  
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  result = response$result
+  
+  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_open_orders <- function(key, secret, market...) {
