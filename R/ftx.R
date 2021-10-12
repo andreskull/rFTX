@@ -181,6 +181,9 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
 
 ftx_future_stat <-  function(key, secret, market, ...) {
   # GET /futures/{market}/stats
+  if(length(market) == 0){
+    logerror(msg = "Market name required.")
+  }
   path = paste0('/api/futures/', market, '/stats')
   response = ftx_send_request(method = "GET", path = path, key, secret)
   result = response$result
