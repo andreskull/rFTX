@@ -181,6 +181,11 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
 
 ftx_future_stat <-  function(key, secret, market, ...) {
   # GET /futures/{market}/stats
+  path = paste0('/api/futures/', market, '/stats')
+  response = ftx_send_request(method = "GET", path = path, key, secret)
+  
+  df <- response %>%
+    tibble::as_tibble()
 }
 
 ftx_future_funding_rates <-  function(key, secret, ...) {
