@@ -37,8 +37,9 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
   
   # add response$success == FALSE handling
+  result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = response, n = names(response)), 1, function(x) {
+  df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
     df <- map_df(x[[1]], tibble::as_tibble)
     df <- df %>% add_column(account = x[[2]])
   }
