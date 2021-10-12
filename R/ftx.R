@@ -24,7 +24,7 @@ ftx_send_request <- function(method, path, key, secret, ...) {
                            `FTX-TS` = as.character(ts)), ...)
   response <- content(r, "parsed")
   if (response$success == FALSE) {
-    logerror(..., )
+    logerror(msg = response$error, ..., )
   }
   response
 }
