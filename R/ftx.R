@@ -111,7 +111,22 @@ ftx_trades <- function(key, secret, market, ...) {
 ftx_historical_prices <- function(key, secret, market, resolution, start_time, end_time, ...) {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
   # check if resolution, start_time and end_time are correct and not contradictory, log error if not
+  path = paste0('/api/markets/', market, '/candles?resolution=', resolution, '&start_time=', start_time, '&end_time=', end_time)
+  if(length(start_time) == 0){
+    path = paste0('/api/markets/', market, '/candles?resolution=', resolution, '&end_time=', end_time)
+  }
+  if(length(end_time) == 0){
+    path = paste0('/api/markets/', market, '/candles?resolution=', resolution, '&start_time=', start_time)
+  }
+  response = ftx_send_request(method = "GET", path = path, key, secret)
+  result = response$result
   
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_future_markets <- function(key, secret, market = NA, ...) {
