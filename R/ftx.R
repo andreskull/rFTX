@@ -257,6 +257,20 @@ ftx_open_orders <- function(key, secret, market, ...) {
 
 ftx_orders_history <- function(key, secret, market, ...) {
   # GET /orders/history?market={market}
+  path = paste0('/api/orders/history')
+  if(!missing(market)){
+    path = paste0(path, '?market=', market)
+  }
+  
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  result = response$result
+  
+  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA, size=NA, reduce_only=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, ...) {
