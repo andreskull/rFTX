@@ -54,6 +54,15 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 
 ftx_positions <- function(key, secret, ...) {
   # GET /positions
+  response = ftx_send_request(method = "GET", path = '/api/positions', key, secret)
+  result = response$result
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 
