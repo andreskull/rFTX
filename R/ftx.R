@@ -81,6 +81,17 @@ ftx_coin_markets <- function(key, secret, ...) {
 
 ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
+  path = paste0('/api/markets/', market, '/orderbook?', depth)
+  response = ftx_send_request(method = "GET", path = path, key, secret)
+  result = response$result
+  
+  df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
+    df <- map_df(x[[1]], tibble::as_tibble, 
+                 .name_repair = ~ vctrs::vec_as_names(...,repair="universal",quiet = T)) %>% 
+      set_names(c('price','size')) %>% 
+      add_column(name = x[[2]])
+  }
+  ))
 }
 
 ftx_trades <- function(key, secret, market, ...) {
