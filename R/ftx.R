@@ -68,7 +68,7 @@ ftx_positions <- function(key, secret, ...) {
 
 ftx_coin_markets <- function(key, secret, ...) {
   # GET /markets
-  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret)
+  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -83,8 +83,9 @@ ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
   if(depth > 100) loginfo(msg = 'Depth value is too large.Max value is 100.')
+  
   path = paste0('/api/markets/', market, '/orderbook?', depth)
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
@@ -105,10 +106,14 @@ ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
     path = paste0(path, '?start_time=', start_time)
   }
   if(!missing(end_time)){
-    path = paste0(path, '?end_time=', end_time)
+    if(missing(start_time)){
+      path = paste0(path, '?end_time=', end_time)
+    } else {
+      path = paste0(path, '&?end_time=', end_time)
+    }
   }
     
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -141,10 +146,14 @@ ftx_historical_prices <- function(key, secret, market, resolution, start_time, e
     path = paste0(path, '?start_time=', start_time)
   }
   if(!missing(end_time)){
-    path = paste0(path, '?end_time=', end_time)
+    if(missing(start_time)){
+      path = paste0(path, '?end_time=', end_time)
+    } else {
+      path = paste0(path, '&?end_time=', end_time)
+    }
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -162,7 +171,7 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
   if(!is.na(market)){
     path = paste0(path, '/', market)
   }
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -184,8 +193,9 @@ ftx_future_stat <-  function(key, secret, market, ...) {
   if(length(market) == 0){
     logerror(msg = "Market name required.")
   }
+  
   path = paste0('/api/futures/', market, '/stats')
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- result %>%
