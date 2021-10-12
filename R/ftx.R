@@ -295,6 +295,9 @@ ftx_order_status <- function(key, secret, order_id, ...) {
 
 ftx_cancel_order <- function(key, secret, order_id, ...) {
   # DELETE /orders/{order_id}
+  path = paste0('/api/orders/', order_id)
+  response = ftx_send_request(method = "DELETE", path = path, key, secret, ...)
+  result = response$result
 }
 
 ftx_order_fills <- function(key, secret, market, ...) {
