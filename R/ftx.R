@@ -303,7 +303,7 @@ ftx_order_fills <- function(key, secret, market, ...) {
   if(!missing(market)){
     path = paste0(path, '?market=', market)
   }
-  response = ftx_send_request(method = "GET", path = path, key, secret)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
