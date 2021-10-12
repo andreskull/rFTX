@@ -158,6 +158,19 @@ ftx_historical_prices <- function(key, secret, market, resolution, start_time, e
 ftx_future_markets <- function(key, secret, market = NA, ...) {
   # GET /futures (if market == NA)
   # GET /futures/{market} (if market != NA)
+  path = paste0('/api/futures')
+  if(!is.na(market)){
+    path = paste0(path, '/', market)
+  }
+  response = ftx_send_request(method = "GET", path = path, key, secret)
+  result = response$result
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_future_stat <-  function(key, secret, market, ...) {
