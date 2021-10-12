@@ -289,11 +289,19 @@ ftx_order_fills <- function(key, secret, market, ...) {
 
 ftx_funding_payments <-  function(key, secret, ...) {
   # GET /funding_payments
+  response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, ...)
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = response), 1, function(x) {
+    df <- x[[1]] %>%
+      purrr::modify_if(is.null, list) %>% 
+      tibble::as_tibble()
+  }
+  ))
 }
 
 ftx_spot_lending_history <- function(key, secret, ...) {
   # GET /spot_margin/history
-  response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret)
+  response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, ...)
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = response), 1, function(x) {
     df <- x[[1]] %>%
