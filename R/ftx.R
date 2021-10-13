@@ -310,6 +310,24 @@ ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA,
 
 ftx_modify_order <- function(key, secret, order_id, size, price, ...) {
   # POST /orders/{order_id}/modify
+  path = paste0('/api/orders/', order_id, '/modify')
+  body <- list()
+  if(!missing(size)){
+    if(is.numeric(size) | is.null(size)){
+      body$size = size
+    }
+  }
+  if(!missing(price)){
+    if(is.numeric(price) | is.null(price)){
+      body$price = price
+    }
+  }
+  
+  response = ftx_send_request(method = "POST", path = path, key, secret, body = body, ...)
+  result = response$result
+  
+  df <- result %>%
+    tibble::as_tibble()
 }
 
 ftx_order_status <- function(key, secret, order_id, ...) {
