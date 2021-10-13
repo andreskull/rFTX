@@ -2,8 +2,8 @@ Package: rFTX
 Title: Connecting to FTX API
 Version: 0.0.0.9000
 Authors@R: 
-    person("Pauline", "Wairimu", , "paunimo@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Andres", "Kull", role = c("aut", "cre")),
+    person("Pauline", "Developer", role = "aut", email = "paunimo@gmail.com"))
 Description: An implementation of calls designed to send and collect data via FTX REST API.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
