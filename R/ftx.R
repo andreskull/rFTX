@@ -1,3 +1,6 @@
+#' @exportPattern ^[[:alpha:]]+
+#'
+
 library(tidyverse)
 library(digest)
 library(lubridate)
@@ -8,6 +11,12 @@ library(httr)
 
 base_url <- "https://ftx.com"
 
+#' @title FTX Send Request
+#' @param method REST API Method such as GET or POST
+#' @param path An additional path defined for each function
+#' @param key A client key
+#' @param secret A client secret
+#' @return A tibble
 
 ftx_send_request <- function(method, path, key, secret, ...) {
   url <- paste0(base_url, path)
@@ -33,6 +42,12 @@ ftx_send_request <- function(method, path, key, secret, ...) {
 # in case of response$success == FALSE the function should return the cause of failure if the FTX API provides it
 # Test with the real failure cases against FTX and decide case-by-case
 
+#' @title FTX Coin Balances
+#' @param key A client key
+#' @param secret A client secret
+#' @param accounts Optional parameter. A vector of client sub-accounts
+#' @return A tibble
+
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
   
@@ -51,6 +66,10 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   }
 }
 
+#' @title FTX Positions
+#' @param key A client key
+#' @param secret A client secret
+#' @return A tibble
 
 ftx_positions <- function(key, secret, ...) {
   # GET /positions
@@ -65,6 +84,10 @@ ftx_positions <- function(key, secret, ...) {
   ))
 }
 
+#' @title FTX Coin Markets
+#' @param key A client key
+#' @param secret A client secret
+#' @return A tibble
 
 ftx_coin_markets <- function(key, secret, ...) {
   # GET /markets
@@ -78,6 +101,13 @@ ftx_coin_markets <- function(key, secret, ...) {
   }
   ))
 }
+
+#' @title FTX Orderbook
+#' @param key A client key
+#' @param secret A client secret
+#' @param market Name of market
+#' @param depth Market depth. Max 100, default 5
+#' @return A tibble
 
 ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
