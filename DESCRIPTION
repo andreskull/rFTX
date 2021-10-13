@@ -1,0 +1,13 @@
+Package: rFTX
+Title: Connecting to FTX API
+Version: 0.0.0.9000
+Authors@R: 
+    person("Pauline", "Wairimu", , "paunimo@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: An implementation of calls designed to send and collect data via FTX REST API.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
