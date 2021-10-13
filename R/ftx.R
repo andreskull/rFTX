@@ -24,7 +24,7 @@ ftx_send_request <- function(method, path, key, secret, ...) {
                            `FTX-TS` = as.character(ts)), ...)
   response <- content(r, "parsed")
   if (response$success == FALSE) {
-    logerror(msg = response$error, ..., )
+    logerror(msg = response$error, ...)
   }
   response
 }
@@ -273,10 +273,39 @@ ftx_orders_history <- function(key, secret, market, ...) {
   ))
 }
 
-ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA, size=NA, reduce_only=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, ...) {
+ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA, ...) {
   # POST /orders
   # check if side, price, type, size, reduce_only, ioc, postonly parameters are correct
+  path = paste0('/api/orders')
+  body = list()
+  if(!missing(market)){
+    body$market = market
+  }
+  if(!missing(side)){
+    if(side %in% c('buy','sell')){
+      body$side = side
+    }
+  }
+  if(!missing(price)){
+    if(is.numeric(price) | is.null(price)){
+      body$price = price
+    }
+  }
+  if(!missing(type)){
+    if(type %in% c('limit','market')){
+      body$type = type
+    }
+  }
+  if(is.numeric(size)) body$size = size
+  if(reduceOnly %in% c(T,F)) body$reduceOnly = reduceOnly
+  if(ioc %in% c(T,F)) body$ioc = ioc
+  if(postOnly %in% c(T,F)) body$postOnly = postOnly
+  body$clientId = clientId
+  response = ftx_send_request(method = "POST", path = path, key, secret, body = body, ...)
+  result = response$result
   
+  df <- result %>%
+    tibble::as_tibble()
 }
 
 ftx_modify_order <- function(key, secret, order_id, size, price, ...) {
