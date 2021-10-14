@@ -7,9 +7,9 @@
 ftx_coin_balances(key, secret, accounts = c(), ...)
 }
 \arguments{
-\item{key}{A client key}
+\item{key}{A client's key}
 
-\item{secret}{A client secret}
+\item{secret}{A client's secret}
 
 \item{accounts}{Optional parameter. A vector of client sub-accounts}
 }

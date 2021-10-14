@@ -11,9 +11,9 @@ ftx_send_request(method, path, key, secret, ...)
 
 \item{path}{An additional path defined for each function}
 
-\item{key}{A client key}
+\item{key}{A client's key}
 
-\item{secret}{A client secret}
+\item{secret}{A client's secret}
 }
 \value{
 A tibble

@@ -7,9 +7,9 @@
 ftx_coin_markets(key, secret, ...)
 }
 \arguments{
-\item{key}{A client key}
+\item{key}{A client's key}
 
-\item{secret}{A client secret}
+\item{secret}{A client's secret}
 }
 \value{
 A tibble
