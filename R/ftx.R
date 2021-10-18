@@ -16,7 +16,7 @@ base_url <- "https://ftx.com"
 #' @param path An additional path defined for each function
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A response returned by request using specified method.
 
 ftx_send_request <- function(method, path, key, secret, ...) {
   url <- paste0(base_url, path)
@@ -46,7 +46,7 @@ ftx_send_request <- function(method, path, key, secret, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param accounts Optional parameter. A vector of client sub-accounts
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
@@ -65,12 +65,18 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   } else {
     df
   }
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Positions
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_positions <- function(key, secret, ...) {
   # GET /positions
@@ -84,12 +90,18 @@ ftx_positions <- function(key, secret, ...) {
       filter(size != 0)
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Coin Markets
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_coin_markets <- function(key, secret, ...) {
   # GET /markets
@@ -102,6 +114,12 @@ ftx_coin_markets <- function(key, secret, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Orderbook
@@ -109,7 +127,7 @@ ftx_coin_markets <- function(key, secret, ...) {
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param depth Market depth. Max 100, default 5
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
@@ -127,6 +145,12 @@ ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
       add_column(name = x[[2]])
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Orderbook
@@ -135,7 +159,7 @@ ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
 #' @param market Name of market
 #' @param start_time Optional parameter. Numeric value from when to extract trades.
 #' @param end_time Optional parameter. Numeric value up-to when to extract trades.
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
   # GET /markets/{market}/trades
@@ -162,6 +186,12 @@ ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Historical Prices
@@ -171,7 +201,7 @@ ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
 #' @param start_time Optional parameter. Numeric value from when to extract prices.
 #' @param end_time Optional parameter. Numeric value up-to when to extract prices.
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_historical_prices <- function(key, secret, market, resolution, start_time, end_time, ...) {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
@@ -207,13 +237,19 @@ ftx_historical_prices <- function(key, secret, market, resolution, start_time, e
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Future Markets
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_markets <- function(key, secret, market = NA, ...) {
   # GET /futures (if market == NA)
@@ -237,13 +273,19 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
       replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Future Stats
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_stat <-  function(key, secret, market, ...) {
   # GET /futures/{market}/stats
@@ -257,6 +299,13 @@ ftx_future_stat <-  function(key, secret, market, ...) {
   
   df <- result %>%
     tibble::as_tibble()
+  
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Future Funding Rates
@@ -265,7 +314,7 @@ ftx_future_stat <-  function(key, secret, market, ...) {
 #' @param market Name of market
 #' @param start_time Numeric value from when to extract rates.
 #' @param end_time Numeric value up-to when to extract rates.
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time, ...) {
   # GET /funding_rates
@@ -304,13 +353,19 @@ ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time,
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Open Orders
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_open_orders <- function(key, secret, market, ...) {
   # GET /orders?market={market}
@@ -328,13 +383,19 @@ ftx_open_orders <- function(key, secret, market, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Orders History
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_orders_history <- function(key, secret, market, ...) {
   # GET /orders/history?market={market}
@@ -352,6 +413,12 @@ ftx_orders_history <- function(key, secret, market, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Place Order
@@ -366,7 +433,7 @@ ftx_orders_history <- function(key, secret, market, ...) {
 #' @param ioc optional; default is false
 #' @param postOnly optional; default is false
 #' @param clientId optional; client order id
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA, ...) {
   # POST /orders
@@ -401,6 +468,12 @@ ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA,
   
   df <- result %>%
     tibble::as_tibble()
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Modify Order
@@ -409,7 +482,7 @@ ftx_place_order <-  function(key, secret, market=NA, side=NA, price=NA, type=NA,
 #' @param order_id Numeric value of order ID
 #' @param size Size of order
 #' @param price Price of order 
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_modify_order <- function(key, secret, order_id, size, price, ...) {
   # POST /orders/{order_id}/modify
@@ -431,13 +504,19 @@ ftx_modify_order <- function(key, secret, order_id, size, price, ...) {
   
   df <- result %>%
     tibble::as_tibble()
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Order Status
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param order_id Numeric value of order ID
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_order_status <- function(key, secret, order_id, ...) {
   # GET /orders/by_client_id/{client_order_id}
@@ -447,26 +526,38 @@ ftx_order_status <- function(key, secret, order_id, ...) {
   
   df <- result %>%
     tibble::as_tibble()
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Cancel Order
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param order_id Numeric value of order ID
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
 
 ftx_cancel_order <- function(key, secret, order_id, ...) {
   # DELETE /orders/{order_id}
   path = paste0('/api/orders/', order_id)
   response = ftx_send_request(method = "DELETE", path = path, key, secret, ...)
   result = response$result
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    result = result
+  )
+  return(return_obj)
 }
 
 #' @title FTX Orders Fills
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_order_fills <- function(key, secret, market, ...) {
   # GET /fills?market={market} 
@@ -483,12 +574,18 @@ ftx_order_fills <- function(key, secret, market, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Funding Payments
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_funding_payments <-  function(key, secret, ...) {
   # GET /funding_payments
@@ -501,12 +598,18 @@ ftx_funding_payments <-  function(key, secret, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Spot Lending History
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_spot_lending_history <- function(key, secret, ...) {
   # GET /spot_margin/history
@@ -519,12 +622,18 @@ ftx_spot_lending_history <- function(key, secret, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Spot Margin Borrow Rates
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_spot_margin_borrow_rates <- function(key, secret, ...) {
   # GET /spot_margin/borrow_rates
@@ -537,12 +646,18 @@ ftx_spot_margin_borrow_rates <- function(key, secret, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
 #' @title FTX Spot Borrow History
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A tibble
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_my_spot_borrow_history <- function(key, secret, ...) {
   # GET /spot_margin/borrow_history
@@ -555,5 +670,11 @@ ftx_my_spot_borrow_history <- function(key, secret, ...) {
       tibble::as_tibble()
   }
   ))
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
 }
 
