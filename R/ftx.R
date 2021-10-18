@@ -79,7 +79,7 @@ ftx_positions <- function(key, secret, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA)  %>% 
       tibble::as_tibble() %>%
       filter(size != 0)
   }
@@ -98,7 +98,7 @@ ftx_coin_markets <- function(key, secret, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -158,7 +158,7 @@ ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -203,7 +203,7 @@ ftx_historical_prices <- function(key, secret, market, resolution, start_time, e
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -227,14 +227,14 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
   
   if(!is.na(market) & length(market) == 1){
     df <- result %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
 }
@@ -300,7 +300,7 @@ ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time,
   
   df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -324,7 +324,7 @@ ftx_open_orders <- function(key, secret, market, ...) {
   
   df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -348,7 +348,7 @@ ftx_orders_history <- function(key, secret, market, ...) {
   
   df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -479,7 +479,7 @@ ftx_order_fills <- function(key, secret, market, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -497,7 +497,7 @@ ftx_funding_payments <-  function(key, secret, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -515,7 +515,7 @@ ftx_spot_lending_history <- function(key, secret, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -533,7 +533,7 @@ ftx_spot_margin_borrow_rates <- function(key, secret, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
@@ -551,7 +551,7 @@ ftx_my_spot_borrow_history <- function(key, secret, ...) {
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
-      purrr::modify_if(is.null, list) %>% 
+      replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble()
   }
   ))
