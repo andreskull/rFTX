@@ -59,6 +59,8 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
     df <- df %>% add_column(account = x[[2]])
   }
   ))
+  df <- df %>%
+    filter(total != 0)
   if (length(accounts) > 0) {
     df <- df %>% filter(account %in% accounts)
   } else {
