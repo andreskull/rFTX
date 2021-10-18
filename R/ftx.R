@@ -80,7 +80,8 @@ ftx_positions <- function(key, secret, ...) {
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
       purrr::modify_if(is.null, list) %>% 
-      tibble::as_tibble()
+      tibble::as_tibble() %>%
+      filter(size != 0)
   }
   ))
 }
