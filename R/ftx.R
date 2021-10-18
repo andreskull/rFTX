@@ -157,8 +157,8 @@ ftx_orderbook <- function(key, secret, market, depth = 5, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @param start_time Optional parameter. Numeric value from when to extract trades.
-#' @param end_time Optional parameter. Numeric value up-to when to extract trades.
+#' @param start_time Optional parameter. POSIXct value from when to extract trades.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
@@ -166,18 +166,17 @@ ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
   # add optional parameters
   path = paste0('/api/markets/', market, '/trades')
   
+  query_list <- list()
+  
   if(!missing(start_time)){
-    path = paste0(path, '?start_time=', start_time)
+    query_list['start_time'] <- as.numeric(start_time)
   }
   if(!missing(end_time)){
-    if(missing(start_time)){
-      path = paste0(path, '?end_time=', end_time)
-    } else {
-      path = paste0(path, '&?end_time=', end_time)
-    }
+    query_list['end_time'] <- as.numeric(end_time)
   }
-    
-  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  
+  response = ftx_send_request(method = "GET", path = path, key, secret, 
+                              query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -199,8 +198,8 @@ ftx_trades <- function(key, secret, market, start_time, end_time, ...) {
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
-#' @param start_time Optional parameter. Numeric value from when to extract prices.
-#' @param end_time Optional parameter. Numeric value up-to when to extract prices.
+#' @param start_time Optional parameter. POSIXct value from when to extract trades.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_historical_prices <- function(key, secret, market, resolution, start_time, end_time, ...) {
@@ -221,14 +220,17 @@ ftx_historical_prices <- function(key, secret, market, resolution, start_time, e
   
   path = paste0('/api/markets/', market, '/candles?resolution=', resolution)
   
+  query_list <- list()
+  
   if(!missing(start_time)){
-    path = paste0(path, '&start_time=', start_time)
+    query_list['start_time'] <- as.numeric(start_time)
   }
   if(!missing(end_time)){
-    path = paste0(path, '&end_time=', end_time)
+    query_list['end_time'] <- as.numeric(end_time)
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, 
+                              query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -312,8 +314,8 @@ ftx_future_stat <-  function(key, secret, market, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @param start_time Numeric value from when to extract rates.
-#' @param end_time Numeric value up-to when to extract rates.
+#' @param start_time POSIXct value from when to extract trades.
+#' @param end_time POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time, ...) {
@@ -329,22 +331,18 @@ ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time,
   if(!missing(market)){
     path = paste0(path, '?future=', market)
   }
+  
+  query_list <- list()
+  
   if(!missing(start_time)){
-    if(missing(market)){
-      path = paste0(path, '?start_time=', start_time)
-    } else {
-      path = paste0(path, '&?start_time=', start_time)
-    }
+    query_list['start_time'] <- as.numeric(start_time)
   }
   if(!missing(end_time)){
-    if(missing(start_time)){
-      path = paste0(path, '?end_time=', end_time)
-    } else {
-      path = paste0(path, '&?end_time=', end_time)
-    }
+    query_list['end_time'] <- as.numeric(end_time)
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, 
+                              query = query_list, ...)
   result = response$result
   
   df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
