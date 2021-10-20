@@ -314,12 +314,12 @@ ftx_future_stat <-  function(key, secret, market, ...) {
 #' @title FTX Future Funding Rates
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param market Name of market
+#' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time, ...) {
+ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_time, ...) {
   # GET /funding_rates
   # checks on start and end times
   if(!missing(start_time) & !missing(end_time)){
@@ -327,11 +327,7 @@ ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time,
       logerror(msg = 'Start date cannot be after end date.')
     }
   }
-  
   path = '/api/funding_rates'
-  if(!missing(market)){
-    path = paste0(path, '?future=', market)
-  }
   
   query_list <- list()
   
@@ -352,6 +348,10 @@ ftx_future_funding_rates <-  function(key, secret, market, start_time, end_time,
       tibble::as_tibble()
   }
   ))
+  if(!missing(markets)){
+    df <- df %>%
+      filter(future %in% markets)
+  }
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
