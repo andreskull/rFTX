@@ -16,27 +16,34 @@ base_url <- "https://ftx.com"
 #' @param path An additional path defined for each function
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param subaccount A client's subaccount
 #' @return A response returned by request using specified method.
 
-ftx_send_request <- function(method, path, key, secret, ...) {
+ftx_send_request <- function(method, path, key, secret, subaccount, ...) {
   url <- paste0(base_url, path)
   fn <- get(method)
   
   ts <- now("UTC") %>% as.integer() * 1000
   signature_payload <- paste0(ts, method, path)
-
+  
   signature <- digest::hmac(enc2utf8(secret),
                             enc2utf8(signature_payload),
                             algo = "sha256") 
-  r <- fn(url, add_headers(`FTX-KEY` = key,
-                           `FTX-SIGN` = signature,
-                           `FTX-TS` = as.character(ts)), ...)
+  headers_vec <- c(`FTX-KEY` = key,
+                   `FTX-SIGN` = signature,
+                   `FTX-TS` = as.character(ts))
+  if(!missing(subaccount)){
+    headers_vec <- c(headers_vec, `FTX-SUBACCOUNT` = subaccount)
+  }
+  r <- fn(url, add_headers(.headers = headers_vec), ...)
+  
   response <- content(r, "parsed")
   if (response$success == FALSE) {
     logerror(msg = response$error, ...)
   }
   response
 }
+
 
 # Functions should return result content in the form of dataframe if result is available and success
 # in case of response$success == FALSE the function should return the cause of failure if the FTX API provides it
