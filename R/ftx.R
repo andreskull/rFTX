@@ -17,25 +17,40 @@ base_url <- "https://ftx.com"
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param body Only for POST method. A named list of values containing market name (string), 
+#' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
+#' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
 #' @return A response returned by request using specified method.
 
-ftx_send_request <- function(method, path, key, secret, subaccount, ...) {
+ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   url <- paste0(base_url, path)
   fn <- get(method)
   
   ts <- now("UTC") %>% as.integer() * 1000
   signature_payload <- paste0(ts, method, path)
   
+  if(method == "POST" & !missing(body)){
+    body_sign <- jsonlite::toJSON(body, auto_unbox = T)
+    signature_payload <- paste0(signature_payload, body_sign)
+  }
+  
   signature <- digest::hmac(enc2utf8(secret),
                             enc2utf8(signature_payload),
                             algo = "sha256") 
+  
   headers_vec <- c(`FTX-KEY` = key,
                    `FTX-SIGN` = signature,
                    `FTX-TS` = as.character(ts))
+  
   if(!missing(subaccount)){
     headers_vec <- c(headers_vec, `FTX-SUBACCOUNT` = subaccount)
   }
+  
   r <- fn(url, add_headers(.headers = headers_vec), ...)
+  
+  if(method == "POST" & !missing(body)){
+    r <- fn(url, add_headers(.headers = headers_vec), body = body, encode = "json", ...)
+  }
   
   response <- content(r, "parsed")
   if (response$success == FALSE) {
@@ -493,11 +508,13 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   if(ioc %in% c(T,F)) body$ioc = ioc
   if(postOnly %in% c(T,F)) body$postOnly = postOnly
   body$clientId = clientId
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = unlist(body), ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
   df <- result %>%
+    replace(lengths(.) == 0, NA) %>%
     tibble::as_tibble()
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -530,11 +547,13 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ...
     }
   }
   
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = unlist(body), ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
   df <- result %>%
+    replace(lengths(.) == 0, NA) %>%
     tibble::as_tibble()
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
