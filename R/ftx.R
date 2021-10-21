@@ -374,9 +374,9 @@ ftx_future_funding_rates <-  function(key, secret, subaccount, markets=c(), star
       tibble::as_tibble()
   }
   ))
-  if(!missing(markets)){
+  if(length(result) > 0 & !missing(markets)){
     df <- df %>%
-      filter(future %in% markets)
+      filter(market %in% markets)
   }
   return_obj <- list(
     success = response$success,
@@ -406,7 +406,7 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), ...) {
       tibble::as_tibble()
   }
   ))
-  if(length(result) > 0){
+  if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
   }
@@ -422,16 +422,13 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param market Name of market
+#' @param markets Vector of names of markets. 
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_orders_history <- function(key, secret, subaccount, market, ...) {
+ftx_orders_history <- function(key, secret, subaccount, markets=c(), ...) {
   # GET /orders/history?market={market}
   path = paste0('/api/orders/history')
-  if(!missing(market)){
-    path = paste0(path, '?market=', market)
-  }
-  
+
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
   
@@ -441,6 +438,10 @@ ftx_orders_history <- function(key, secret, subaccount, market, ...) {
       tibble::as_tibble()
   }
   ))
+  if(length(result) > 0 & !missing(markets)){
+    df <- df %>%
+      filter(market %in% markets)
+  }
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -589,15 +590,13 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param market Name of market
+#' @param markets Vector of names of markets. 
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_order_fills <- function(key, secret, subaccount, market, ...) {
+ftx_order_fills <- function(key, secret, subaccount, markets=c(), ...) {
   # GET /fills?market={market} 
   path = '/api/fills'
-  if(!missing(market)){
-    path = paste0(path, '?market=', market)
-  }
+  
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
   
@@ -607,6 +606,10 @@ ftx_order_fills <- function(key, secret, subaccount, market, ...) {
       tibble::as_tibble()
   }
   ))
+  if(length(result) > 0 & !missing(markets)){
+    df <- df %>%
+      filter(market %in% markets)
+  }
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
