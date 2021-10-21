@@ -4,15 +4,17 @@
 \alias{ftx_positions}
 \title{FTX Positions}
 \usage{
-ftx_positions(key, secret, ...)
+ftx_positions(key, secret, subaccount, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Positions

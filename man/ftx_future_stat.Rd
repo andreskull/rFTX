@@ -4,17 +4,19 @@
 \alias{ftx_future_stat}
 \title{FTX Future Stats}
 \usage{
-ftx_future_stat(key, secret, market, ...)
+ftx_future_stat(key, secret, subaccount, market, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
+\item{subaccount}{A client's subaccount}
+
 \item{market}{Name of market}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Future Stats

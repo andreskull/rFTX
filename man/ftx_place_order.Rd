@@ -7,6 +7,7 @@
 ftx_place_order(
   key,
   secret,
+  subaccount,
   market = NA,
   side = NA,
   price = NA,
@@ -23,6 +24,8 @@ ftx_place_order(
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
 
 \item{market}{Name of market}
 
@@ -43,7 +46,7 @@ ftx_place_order(
 \item{clientId}{optional; client order id}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Place Order

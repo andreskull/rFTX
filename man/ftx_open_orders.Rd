@@ -4,17 +4,19 @@
 \alias{ftx_open_orders}
 \title{FTX Open Orders}
 \usage{
-ftx_open_orders(key, secret, market, ...)
+ftx_open_orders(key, secret, subaccount, markets = c(), ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
-\item{market}{Name of market}
+\item{subaccount}{A client's subaccount}
+
+\item{markets}{Vector of names of markets.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Open Orders

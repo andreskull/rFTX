@@ -4,12 +4,14 @@
 \alias{ftx_modify_order}
 \title{FTX Modify Order}
 \usage{
-ftx_modify_order(key, secret, order_id, size, price, ...)
+ftx_modify_order(key, secret, subaccount, order_id, size, price, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
 
 \item{order_id}{Numeric value of order ID}
 
@@ -18,7 +20,7 @@ ftx_modify_order(key, secret, order_id, size, price, ...)
 \item{price}{Price of order}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Modify Order

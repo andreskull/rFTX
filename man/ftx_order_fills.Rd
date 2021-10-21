@@ -4,17 +4,31 @@
 \alias{ftx_order_fills}
 \title{FTX Orders Fills}
 \usage{
-ftx_order_fills(key, secret, market, ...)
+ftx_order_fills(
+  key,
+  secret,
+  subaccount,
+  markets = c(),
+  start_time,
+  end_time,
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
-\item{market}{Name of market}
+\item{subaccount}{A client's subaccount}
+
+\item{markets}{Vector of names of markets.}
+
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
+
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Orders Fills

@@ -4,17 +4,19 @@
 \alias{ftx_coin_balances}
 \title{FTX Coin Balances}
 \usage{
-ftx_coin_balances(key, secret, accounts = c(), ...)
+ftx_coin_balances(key, secret, subaccount, accounts = c(), ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
+\item{subaccount}{A client's subaccount}
+
 \item{accounts}{Optional parameter. A vector of client sub-accounts}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Coin Balances

@@ -4,7 +4,7 @@
 \alias{ftx_send_request}
 \title{FTX Send Request}
 \usage{
-ftx_send_request(method, path, key, secret, ...)
+ftx_send_request(method, path, key, secret, subaccount, ...)
 }
 \arguments{
 \item{method}{REST API Method such as GET or POST}
@@ -14,9 +14,11 @@ ftx_send_request(method, path, key, secret, ...)
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
 }
 \value{
-A tibble
+A response returned by request using specified method.
 }
 \description{
 FTX Send Request

@@ -4,21 +4,31 @@
 \alias{ftx_future_funding_rates}
 \title{FTX Future Funding Rates}
 \usage{
-ftx_future_funding_rates(key, secret, market, start_time, end_time, ...)
+ftx_future_funding_rates(
+  key,
+  secret,
+  subaccount,
+  markets = c(),
+  start_time,
+  end_time,
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
-\item{market}{Name of market}
+\item{subaccount}{A client's subaccount}
 
-\item{start_time}{Numeric value from when to extract rates.}
+\item{markets}{Vector of names of markets.}
 
-\item{end_time}{Numeric value up-to when to extract rates.}
+\item{start_time}{POSIXct value from when to extract trades.}
+
+\item{end_time}{POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Future Funding Rates

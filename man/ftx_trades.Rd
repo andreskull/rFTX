@@ -4,21 +4,23 @@
 \alias{ftx_trades}
 \title{FTX Orderbook}
 \usage{
-ftx_trades(key, secret, market, start_time, end_time, ...)
+ftx_trades(key, secret, subaccount, market, start_time, end_time, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
+\item{subaccount}{A client's subaccount}
+
 \item{market}{Name of market}
 
-\item{start_time}{Optional parameter. Numeric value from when to extract trades.}
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
-\item{end_time}{Optional parameter. Numeric value up-to when to extract trades.}
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Orderbook

@@ -4,19 +4,21 @@
 \alias{ftx_orderbook}
 \title{FTX Orderbook}
 \usage{
-ftx_orderbook(key, secret, market, depth = 5, ...)
+ftx_orderbook(key, secret, subaccount, market, depth = 5, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
+\item{subaccount}{A client's subaccount}
+
 \item{market}{Name of market}
 
 \item{depth}{Market depth. Max 100, default 5}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Orderbook

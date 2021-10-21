@@ -4,15 +4,21 @@
 \alias{ftx_funding_payments}
 \title{FTX Funding Payments}
 \usage{
-ftx_funding_payments(key, secret, ...)
+ftx_funding_payments(key, secret, subaccount, start_time, end_time, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
+
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
+
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Funding Payments

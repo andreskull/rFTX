@@ -4,17 +4,19 @@
 \alias{ftx_order_status}
 \title{FTX Order Status}
 \usage{
-ftx_order_status(key, secret, order_id, ...)
+ftx_order_status(key, secret, subaccount, order_id, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
+\item{subaccount}{A client's subaccount}
+
 \item{order_id}{Numeric value of order ID}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Order Status
