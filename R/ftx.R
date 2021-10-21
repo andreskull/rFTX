@@ -493,7 +493,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   if(ioc %in% c(T,F)) body$ioc = ioc
   if(postOnly %in% c(T,F)) body$postOnly = postOnly
   body$clientId = clientId
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = unlist(body), ...)
   result = response$result
   
   df <- result %>%
@@ -530,7 +530,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ...
     }
   }
   
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = unlist(body), ...)
   result = response$result
   
   df <- result %>%
