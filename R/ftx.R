@@ -339,8 +339,8 @@ ftx_future_stat <-  function(key, secret, subaccount, market, ...) {
 #' @title FTX Future Funding Rates
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param markets Vector of names of markets. 
 #' @param subaccount A client's subaccount
+#' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
@@ -390,15 +390,12 @@ ftx_future_funding_rates <-  function(key, secret, subaccount, markets=c(), star
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param market Name of market
+#' @param markets Vector of names of markets. 
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_open_orders <- function(key, secret, subaccount, market, ...) {
+ftx_open_orders <- function(key, secret, subaccount, markets=c(), ...) {
   # GET /orders?market={market}
   path = paste0('/api/orders')
-  if(!missing(market)){
-    path = paste0(path, '?market=', market)
-  }
   
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
@@ -409,6 +406,10 @@ ftx_open_orders <- function(key, secret, subaccount, market, ...) {
       tibble::as_tibble()
   }
   ))
+  if(length(result) > 0){
+    df <- df %>%
+      filter(market %in% markets)
+  }
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
