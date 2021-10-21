@@ -92,13 +92,17 @@ ftx_positions <- function(key, secret, subaccount, ...) {
   response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA)  %>% 
-      tibble::as_tibble() %>%
-      filter(size != 0)
+  if(length(result) > 0){
+    df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+      df <- x[[1]] %>%
+        replace(lengths(.) == 0, NA)  %>% 
+        tibble::as_tibble() %>%
+        filter(size != 0)
+    }
+    ))
+  } else {
+    df <- tibble()
   }
-  ))
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
