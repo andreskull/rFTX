@@ -591,13 +591,30 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
+#' @param start_time Optional parameter. POSIXct value from when to extract trades.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_order_fills <- function(key, secret, subaccount, markets=c(), ...) {
+ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time, end_time, ...) {
   # GET /fills?market={market} 
   path = '/api/fills'
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  if(!missing(start_time) & !missing(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
+  query_list <- list()
+  
+  if(!missing(start_time)){
+    query_list['start_time'] <- as.numeric(start_time)
+  }
+  if(!missing(end_time)){
+    query_list['end_time'] <- as.numeric(end_time)
+  }
+  
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
+                              query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -622,11 +639,27 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param start_time Optional parameter. POSIXct value from when to extract trades.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_funding_payments <-  function(key, secret, subaccount, ...) {
+ftx_funding_payments <-  function(key, secret, subaccount, start_time, end_time, ...) {
   # GET /funding_payments
-  response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, subaccount, ...)
+  if(!missing(start_time) & !missing(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
+  query_list <- list()
+  
+  if(!missing(start_time)){
+    query_list['start_time'] <- as.numeric(start_time)
+  }
+  if(!missing(end_time)){
+    query_list['end_time'] <- as.numeric(end_time)
+  }
+  response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, 
+                              subaccount, query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -647,11 +680,28 @@ ftx_funding_payments <-  function(key, secret, subaccount, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param start_time Optional parameter. POSIXct value from when to extract trades.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_spot_lending_history <- function(key, secret, subaccount, ...) {
+ftx_spot_lending_history <- function(key, secret, subaccount, start_time, end_time, ...) {
   # GET /spot_margin/history
-  response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, subaccount, ...)
+  if(!missing(start_time) & !missing(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
+  query_list <- list()
+  
+  if(!missing(start_time)){
+    query_list['start_time'] <- as.numeric(start_time)
+  }
+  if(!missing(end_time)){
+    query_list['end_time'] <- as.numeric(end_time)
+  }
+  
+  response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, 
+                              subaccount, query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -697,11 +747,27 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param start_time Optional parameter. POSIXct value from when to extract trades.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_my_spot_borrow_history <- function(key, secret, subaccount, ...) {
+ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time, end_time, ...) {
   # GET /spot_margin/borrow_history
-  response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, subaccount, ...)
+  if(!missing(start_time) & !missing(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
+  query_list <- list()
+  
+  if(!missing(start_time)){
+    query_list['start_time'] <- as.numeric(start_time)
+  }
+  if(!missing(end_time)){
+    query_list['end_time'] <- as.numeric(end_time)
+  }
+  response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, 
+                              subaccount, query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
