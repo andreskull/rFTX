@@ -62,17 +62,23 @@ ftx_coin_balances <- function(key, secret, subaccount, accounts = c(), ...) {
   # add response$success == FALSE handling
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
-    df <- map_df(x[[1]], tibble::as_tibble)
-    df <- df %>% add_column(account = x[[2]]) %>%
-      filter(total != 0)
-  }
-  ))
-  if (length(accounts) > 0) {
-    df <- df %>% filter(account %in% accounts)
+  if(length(result) > 0){
+    df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
+      df <- map_df(x[[1]], tibble::as_tibble)
+      df <- df %>% add_column(account = x[[2]]) %>%
+        filter(total != 0)
+    }
+    ))
+    
+    if (length(accounts) > 0) {
+      df <- df %>% filter(account %in% accounts)
+    } else {
+      df
+    }
   } else {
-    df
+    df <- tibble()
   }
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
