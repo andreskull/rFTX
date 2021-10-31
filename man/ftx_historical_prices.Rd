@@ -8,9 +8,9 @@ ftx_historical_prices(
   key,
   secret,
   market,
-  resolution,
-  start_time,
-  end_time,
+  resolution = 14400,
+  start_time = NA,
+  end_time = NA,
   ...
 )
 }
@@ -23,12 +23,12 @@ ftx_historical_prices(
 
 \item{resolution}{Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400}
 
-\item{start_time}{Optional parameter. Numeric value from when to extract prices.}
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
-\item{end_time}{Optional parameter. Numeric value up-to when to extract prices.}
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Historical Prices

@@ -12,7 +12,7 @@ ftx_coin_markets(key, secret, ...)
 \item{secret}{A client's secret}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Coin Markets

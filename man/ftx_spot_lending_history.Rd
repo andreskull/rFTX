@@ -4,15 +4,19 @@
 \alias{ftx_spot_lending_history}
 \title{FTX Spot Lending History}
 \usage{
-ftx_spot_lending_history(key, secret, ...)
+ftx_spot_lending_history(key, secret, start_time = NA, end_time = NA, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
+
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Spot Lending History

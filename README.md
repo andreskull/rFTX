@@ -1,2 +1,2 @@
 # rFTX
-R API for FTX
+R API for FTX (Under Development)

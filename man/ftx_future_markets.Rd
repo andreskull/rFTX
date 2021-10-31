@@ -14,7 +14,7 @@ ftx_future_markets(key, secret, market = NA, ...)
 \item{market}{Name of market}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Future Markets

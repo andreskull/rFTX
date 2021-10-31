@@ -4,15 +4,17 @@
 \alias{ftx_spot_margin_borrow_rates}
 \title{FTX Spot Margin Borrow Rates}
 \usage{
-ftx_spot_margin_borrow_rates(key, secret, ...)
+ftx_spot_margin_borrow_rates(key, secret, subaccount, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
 FTX Spot Margin Borrow Rates

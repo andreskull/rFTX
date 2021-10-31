@@ -4,7 +4,7 @@
 \alias{ftx_send_request}
 \title{FTX Send Request}
 \usage{
-ftx_send_request(method, path, key, secret, ...)
+ftx_send_request(method, path, key, secret, subaccount, body, ...)
 }
 \arguments{
 \item{method}{REST API Method such as GET or POST}
@@ -14,9 +14,15 @@ ftx_send_request(method, path, key, secret, ...)
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{subaccount}{A client's subaccount}
+
+\item{body}{Only for POST method. A named list of values containing market name (string),
+side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"),
+reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)}
 }
 \value{
-A tibble
+A response returned by request using specified method.
 }
 \description{
 FTX Send Request

@@ -3,10 +3,10 @@ Type: Package
 Title: Connecting to FTX API
 Version: 0.0.0.9000
 Authors@R: 
-    c(person("Andres", "Kull", email = "someone@example.com",role = c("aut", "cre")),
+    c(person("Andres", "Kull", email = "andres.a.kull@gmail.com",role = c("aut", "cre")),
     person("Pauline", "Developer", role = "ctb", email = "paunimo@gmail.com"))
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: An implementation of calls designed to send and collect data via FTX REST API.
+Maintainer: The package maintainer <andres.a.kull@gmail.com>
+Description: R implementation of FTX REST API.
 Depends:
     R (>= 2.15),
     tidyverse,
@@ -22,7 +22,7 @@ Imports:
     purrr,
     vctrs,
     digest,
-    magrittr
+    jsonlite
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

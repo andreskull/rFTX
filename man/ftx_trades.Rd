@@ -2,9 +2,9 @@
 % Please edit documentation in R/ftx.R
 \name{ftx_trades}
 \alias{ftx_trades}
-\title{FTX Orderbook}
+\title{FTX Trades}
 \usage{
-ftx_trades(key, secret, market, start_time, end_time, ...)
+ftx_trades(key, secret, market, start_time = NA, end_time = NA, ...)
 }
 \arguments{
 \item{key}{A client's key}
@@ -13,13 +13,13 @@ ftx_trades(key, secret, market, start_time, end_time, ...)
 
 \item{market}{Name of market}
 
-\item{start_time}{Optional parameter. Numeric value from when to extract trades.}
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
-\item{end_time}{Optional parameter. Numeric value up-to when to extract trades.}
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 }
 \value{
-A tibble
+A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
-FTX Orderbook
+FTX Trades
 }
