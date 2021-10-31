@@ -4,7 +4,14 @@
 \alias{ftx_funding_payments}
 \title{FTX Funding Payments}
 \usage{
-ftx_funding_payments(key, secret, subaccount, start_time, end_time, ...)
+ftx_funding_payments(
+  key,
+  secret,
+  subaccount,
+  start_time = NA,
+  end_time = NA,
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}

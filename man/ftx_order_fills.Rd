@@ -9,8 +9,8 @@ ftx_order_fills(
   secret,
   subaccount,
   markets = c(),
-  start_time,
-  end_time,
+  start_time = NA,
+  end_time = NA,
   ...
 )
 }

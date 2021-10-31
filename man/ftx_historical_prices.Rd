@@ -7,11 +7,10 @@
 ftx_historical_prices(
   key,
   secret,
-  subaccount,
   market,
-  resolution,
-  start_time,
-  end_time,
+  resolution = 14400,
+  start_time = NA,
+  end_time = NA,
   ...
 )
 }
@@ -19,8 +18,6 @@ ftx_historical_prices(
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
-
-\item{subaccount}{A client's subaccount}
 
 \item{market}{Name of market}
 

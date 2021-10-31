@@ -4,14 +4,12 @@
 \alias{ftx_coin_markets}
 \title{FTX Coin Markets}
 \usage{
-ftx_coin_markets(key, secret, subaccount, ...)
+ftx_coin_markets(key, secret, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
-
-\item{subaccount}{A client's subaccount}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

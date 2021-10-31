@@ -67,12 +67,11 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
 #' @title FTX Coin Balances
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param accounts Optional parameter. A vector of client sub-accounts
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_coin_balances <- function(key, secret, subaccount, accounts = c(), ...) {
-  response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, subaccount, ...)
+ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
+  response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
   
   # add response$success == FALSE handling
   result = response$result
@@ -108,7 +107,7 @@ ftx_coin_balances <- function(key, secret, subaccount, accounts = c(), ...) {
 #' @param subaccount A client's subaccount
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_positions <- function(key, secret, subaccount, ...) {
+ftx_positions <- function(key, secret, subaccount = NA, ...) {
   # GET /positions
   response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, ...)
   result = response$result
@@ -135,12 +134,11 @@ ftx_positions <- function(key, secret, subaccount, ...) {
 #' @title FTX Coin Markets
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_coin_markets <- function(key, secret, subaccount, ...) {
+ftx_coin_markets <- function(key, secret, ...) {
   # GET /markets
-  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, subaccount, ...)
+  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -160,18 +158,18 @@ ftx_coin_markets <- function(key, secret, subaccount, ...) {
 #' @title FTX Orderbook
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param market Name of market
-#' @param depth Market depth. Max 100, default 5
+#' @param depth Market depth. Min 1, Max 100, default 5
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_orderbook <- function(key, secret, subaccount, market, depth = 5, ...) {
+ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
-  if(depth > 100) loginfo(msg = 'Depth value is too large.Max value is 100.')
+  if(depth > 100) loginfo(msg = 'Depth value is too large. Max value is 100.')
+  if(depth < 1) loginfo(msg = 'Depth value is too small. Min value is 1.')
   
   path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
@@ -189,16 +187,15 @@ ftx_orderbook <- function(key, secret, subaccount, market, depth = 5, ...) {
   return(return_obj)
 }
 
-#' @title FTX Orderbook
+#' @title FTX Trades
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param market Name of market
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_trades <- function(key, secret, subaccount, market, start_time, end_time, ...) {
+ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, ...) {
   # GET /markets/{market}/trades
   # add optional parameters
   path = paste0('/api/markets/', market, '/trades')
@@ -212,7 +209,7 @@ ftx_trades <- function(key, secret, subaccount, market, start_time, end_time, ..
     query_list['end_time'] <- as.numeric(end_time)
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
+  response = ftx_send_request(method = "GET", path = path, key, secret, 
                               query = query_list, ...)
   result = response$result
   
@@ -233,14 +230,13 @@ ftx_trades <- function(key, secret, subaccount, market, start_time, end_time, ..
 #' @title FTX Historical Prices
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param market Name of market
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_historical_prices <- function(key, secret, subaccount, market, resolution, start_time, end_time, ...) {
+ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, ...) {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
   # check if resolution, start_time and end_time are correct and not contradictory, log error if not
   # check resolution parameter
@@ -268,7 +264,7 @@ ftx_historical_prices <- function(key, secret, subaccount, market, resolution, s
     query_list['end_time'] <- as.numeric(end_time)
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
+  response = ftx_send_request(method = "GET", path = path, key, secret,
                               query = query_list, ...)
   result = response$result
   
@@ -289,18 +285,17 @@ ftx_historical_prices <- function(key, secret, subaccount, market, resolution, s
 #' @title FTX Future Markets
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param market Name of market
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_future_markets <- function(key, secret, subaccount, market = NA, ...) {
+ftx_future_markets <- function(key, secret, market = NA, ...) {
   # GET /futures (if market == NA)
   # GET /futures/{market} (if market != NA)
   path = paste0('/api/futures')
   if(!is.na(market)){
     path = paste0(path, '/', market)
   }
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -326,18 +321,14 @@ ftx_future_markets <- function(key, secret, subaccount, market = NA, ...) {
 #' @title FTX Future Stats
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param market Name of market
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_future_stat <-  function(key, secret, subaccount, market, ...) {
+ftx_future_stat <-  function(key, secret, market, ...) {
   # GET /futures/{market}/stats
-  if(length(market) == 0){
-    logerror(msg = "Market name required.")
-  }
-  
+
   path = paste0('/api/futures/', market, '/stats')
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
   df <- result %>%
@@ -354,13 +345,12 @@ ftx_future_stat <-  function(key, secret, subaccount, market, ...) {
 #' @title FTX Future Funding Rates
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_future_funding_rates <-  function(key, secret, subaccount, markets=c(), start_time, end_time, ...) {
+ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_time, ...) {
   # GET /funding_rates
   # checks on start and end times
   if(!missing(start_time) & !missing(end_time)){
@@ -379,7 +369,7 @@ ftx_future_funding_rates <-  function(key, secret, subaccount, markets=c(), star
     query_list['end_time'] <- as.numeric(end_time)
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
+  response = ftx_send_request(method = "GET", path = path, key, secret,
                               query = query_list, ...)
   result = response$result
   
@@ -391,7 +381,7 @@ ftx_future_funding_rates <-  function(key, secret, subaccount, markets=c(), star
   ))
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
-      filter(market %in% markets)
+      filter(future %in% markets)
   }
   return_obj <- list(
     success = response$success,
@@ -571,9 +561,16 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ...
 
 ftx_order_status <- function(key, secret, subaccount, order_id, ...) {
   # GET /orders/by_client_id/{client_order_id}
-  path = paste0('/api/orders/by_client_id/', order_id)
+  path = paste0('/api/orders/', order_id)
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
+  
+  n_results <- length(result$id)
+  
+  result <- result %>% lapply(function(x) {
+    if (class(x) == "NULL") rep(NA, n_results)
+    else x
+  })
   
   df <- result %>%
     tibble::as_tibble()
@@ -614,7 +611,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time, end_time, ...) {
+ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, ...) {
   # GET /fills?market={market} 
   path = '/api/fills'
   
@@ -662,7 +659,7 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time, en
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_funding_payments <-  function(key, secret, subaccount, start_time, end_time, ...) {
+ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, ...) {
   # GET /funding_payments
   if(!missing(start_time) & !missing(end_time)){
     if(start_time > end_time){
@@ -698,12 +695,11 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time, end_time,
 #' @title FTX Spot Lending History
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_spot_lending_history <- function(key, secret, subaccount, start_time, end_time, ...) {
+ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, ...) {
   # GET /spot_margin/history
   if(!missing(start_time) & !missing(end_time)){
     if(start_time > end_time){
@@ -720,7 +716,7 @@ ftx_spot_lending_history <- function(key, secret, subaccount, start_time, end_ti
   }
   
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, 
-                              subaccount, query = query_list, ...)
+                              query = query_list, ...)
   result = response$result
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {

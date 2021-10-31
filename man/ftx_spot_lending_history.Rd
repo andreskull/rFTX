@@ -4,14 +4,12 @@
 \alias{ftx_spot_lending_history}
 \title{FTX Spot Lending History}
 \usage{
-ftx_spot_lending_history(key, secret, subaccount, start_time, end_time, ...)
+ftx_spot_lending_history(key, secret, start_time = NA, end_time = NA, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
-
-\item{subaccount}{A client's subaccount}
 
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 

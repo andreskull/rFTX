@@ -4,7 +4,7 @@
 \alias{ftx_positions}
 \title{FTX Positions}
 \usage{
-ftx_positions(key, secret, subaccount, ...)
+ftx_positions(key, secret, subaccount = NA, ...)
 }
 \arguments{
 \item{key}{A client's key}

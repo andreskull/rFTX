@@ -4,14 +4,12 @@
 \alias{ftx_future_stat}
 \title{FTX Future Stats}
 \usage{
-ftx_future_stat(key, secret, subaccount, market, ...)
+ftx_future_stat(key, secret, market, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
-
-\item{subaccount}{A client's subaccount}
 
 \item{market}{Name of market}
 }

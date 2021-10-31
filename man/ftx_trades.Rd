@@ -2,16 +2,14 @@
 % Please edit documentation in R/ftx.R
 \name{ftx_trades}
 \alias{ftx_trades}
-\title{FTX Orderbook}
+\title{FTX Trades}
 \usage{
-ftx_trades(key, secret, subaccount, market, start_time, end_time, ...)
+ftx_trades(key, secret, market, start_time = NA, end_time = NA, ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
-
-\item{subaccount}{A client's subaccount}
 
 \item{market}{Name of market}
 
@@ -23,5 +21,5 @@ ftx_trades(key, secret, subaccount, market, start_time, end_time, ...)
 A list of three elements: success: false/true, failure_reason: if available, data: tibble
 }
 \description{
-FTX Orderbook
+FTX Trades
 }
