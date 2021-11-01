@@ -653,7 +653,9 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
   
   df <- result %>%
     replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble()
+    tibble::as_tibble() %>%
+    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
+                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
   
   return_obj <- list(
     success = response$success,
