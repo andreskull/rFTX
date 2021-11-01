@@ -217,7 +217,8 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, ...)
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), format = "%Y-%m-%dT%H:%M:%OS%z"))
+      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
+                               format = "%Y-%m-%dT%H:%M:%OS%z"))
   }
   ))
   return_obj <- list(
@@ -273,7 +274,8 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble() %>%
-      mutate(startTime = as.POSIXct(gsub("(.*):", "\\1", startTime), format = "%Y-%m-%dT%H:%M:%OS%z"))
+      mutate(startTime = as.POSIXct(gsub("(.*):", "\\1", startTime), 
+                                    format = "%Y-%m-%dT%H:%M:%OS%z"))
   }
   ))
   return_obj <- list(
@@ -304,7 +306,8 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble() %>%
-      mutate(expiry = as.POSIXct(gsub("(.*):", "\\1", expiry), format = "%Y-%m-%dT%H:%M:%OS%z"))
+      mutate(expiry = as.POSIXct(gsub("(.*):", "\\1", expiry), 
+                                 format = "%Y-%m-%dT%H:%M:%OS%z"))
   }
   ))
   
@@ -335,7 +338,9 @@ ftx_future_stat <-  function(key, secret, market, ...) {
   result = response$result
   
   df <- result %>%
-    tibble::as_tibble()
+    tibble::as_tibble() %>%
+    mutate(nextFundingTime = as.POSIXct(gsub("(.*):", "\\1", nextFundingTime), 
+                                        format = "%Y-%m-%dT%H:%M:%OS%z"))
   
   return_obj <- list(
     success = response$success,
