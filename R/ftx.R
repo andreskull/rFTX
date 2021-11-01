@@ -418,7 +418,10 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), ...) {
   df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
+      tibble::as_tibble() %>%
+      mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
+                                    format = "%Y-%m-%dT%H:%M:%OS%z"))
+    
   }
   ))
   if(length(result) > 0 & !missing(markets)){
