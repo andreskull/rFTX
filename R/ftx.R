@@ -634,7 +634,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param client_id Numeric value of client order ID
+#' @param client_id Character string of client order ID
 #' @param size Size of order
 #' @param price Price of order 
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
@@ -675,7 +675,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param client_id Numeric value of client order ID
+#' @param client_id Character string of client order ID
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
@@ -708,7 +708,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param client_id Numeric value of client order ID
+#' @param client_id Character string of client order ID
 #' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
 
 ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
