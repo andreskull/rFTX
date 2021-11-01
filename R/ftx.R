@@ -602,6 +602,95 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
   return(return_obj)
 }
 
+#' @title FTX Modify Order by Client ID
+#' @param key A client's key
+#' @param secret A client's secret
+#' @param subaccount A client's subaccount
+#' @param client_id Numeric value of client order ID
+#' @param size Size of order
+#' @param price Price of order 
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+
+ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, price, ...) {
+  # POST /orders/by_client_id/{client_order_id}/modify
+  path = paste0('/api/orders/by_client_id/', client_id, '/modify')
+  body <- list()
+  if(!missing(size)){
+    if(is.numeric(size) | is.null(size)){
+      body$size = size
+    }
+  }
+  if(!missing(price)){
+    if(is.numeric(price) | is.null(price)){
+      body$price = price
+    }
+  }
+  
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  result = response$result
+  
+  df <- result %>%
+    replace(lengths(.) == 0, NA) %>%
+    tibble::as_tibble()
+  
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
+}
+
+#' @title FTX Order Status by Client ID
+#' @param key A client's key
+#' @param secret A client's secret
+#' @param subaccount A client's subaccount
+#' @param client_id Numeric value of client order ID
+#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+
+ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
+  # GET /orders/by_client_id/{client_order_id}
+  path = paste0('/api/orders/by_client_id/', client_id)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  result = response$result
+  
+  n_results <- length(result$id)
+  
+  result <- result %>% lapply(function(x) {
+    if (class(x) == "NULL") rep(NA, n_results)
+    else x
+  })
+  
+  df <- result %>%
+    tibble::as_tibble()
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
+}
+
+#' @title FTX Cancel Order by Client ID
+#' @param key A client's key
+#' @param secret A client's secret
+#' @param subaccount A client's subaccount
+#' @param client_id Numeric value of client order ID
+#' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+
+ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
+  # DELETE /orders/by_client_id/{client_order_id}
+  path = paste0('/api/orders/by_client_id/', client_id)
+  response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, ...)
+  result = response$result
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    result = result
+  )
+  return(return_obj)
+}
+
 #' @title FTX Orders Fills
 #' @param key A client's key
 #' @param secret A client's secret
