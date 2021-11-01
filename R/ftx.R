@@ -200,12 +200,18 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, ...)
   # add optional parameters
   path = paste0('/api/markets/', market, '/trades')
   
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
+  
   query_list <- list()
   
-  if(!missing(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!missing(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   
@@ -249,7 +255,7 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   }
   
   # check start and end times
-  if(!missing(start_time) & !missing(end_time)){
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
       logerror(msg = 'Start date cannot be after end date.')
     }
@@ -259,10 +265,10 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   
   query_list <- list()
   
-  if(!missing(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!missing(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   
@@ -361,7 +367,7 @@ ftx_future_stat <-  function(key, secret, market, ...) {
 ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_time, ...) {
   # GET /funding_rates
   # checks on start and end times
-  if(!missing(start_time) & !missing(end_time)){
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
       logerror(msg = 'Start date cannot be after end date.')
     }
@@ -370,10 +376,10 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_
   
   query_list <- list()
   
-  if(!missing(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!missing(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   
@@ -731,17 +737,17 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
   # GET /fills?market={market} 
   path = '/api/fills'
   
-  if(!missing(start_time) & !missing(end_time)){
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
       logerror(msg = 'Start date cannot be after end date.')
     }
   }
   query_list <- list()
   
-  if(!missing(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!missing(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   
@@ -779,17 +785,17 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 
 ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, ...) {
   # GET /funding_payments
-  if(!missing(start_time) & !missing(end_time)){
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
       logerror(msg = 'Start date cannot be after end date.')
     }
   }
   query_list <- list()
   
-  if(!missing(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!missing(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, 
@@ -821,17 +827,17 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 
 ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, ...) {
   # GET /spot_margin/history
-  if(!is.na(start_time) & !is.na(end_time)){
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
       logerror(msg = 'Start date cannot be after end date.')
     }
   }
   query_list <- list()
   
-  if(!is.na(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!is.na(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   
@@ -890,17 +896,17 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ...) {
 
 ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time, end_time, ...) {
   # GET /spot_margin/borrow_history
-  if(!missing(start_time) & !missing(end_time)){
+  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
       logerror(msg = 'Start date cannot be after end date.')
     }
   }
   query_list <- list()
   
-  if(!missing(start_time)){
+  if(!missing(start_time) & !is.na(start_time)){
     query_list['start_time'] <- as.numeric(start_time)
   }
-  if(!missing(end_time)){
+  if(!missing(end_time) & !is.na(end_time)){
     query_list['end_time'] <- as.numeric(end_time)
   }
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, 
@@ -910,7 +916,9 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time, end_
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
+      tibble::as_tibble() %>%
+      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
+                               format = "%Y-%m-%dT%H:%M:%OS%z"))
   }
   ))
   return_obj <- list(
