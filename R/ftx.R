@@ -686,7 +686,10 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
   })
   
   df <- result %>%
-    tibble::as_tibble()
+    tibble::as_tibble() %>%
+    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
+                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
