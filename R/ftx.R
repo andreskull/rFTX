@@ -271,7 +271,8 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
+      tibble::as_tibble() %>%
+      mutate(startTime = as.POSIXct(gsub("(.*):", "\\1", startTime), format = "%Y-%m-%dT%H:%M:%OS%z"))
   }
   ))
   return_obj <- list(
