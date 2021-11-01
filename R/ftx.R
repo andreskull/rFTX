@@ -799,7 +799,9 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
+      tibble::as_tibble() %>%
+      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
+                               format = "%Y-%m-%dT%H:%M:%OS%z"))
   }
   ))
   return_obj <- list(
