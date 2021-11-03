@@ -34,7 +34,7 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("andreskull/rFTX")
 ```
-## Example
+## GET Example
 
 This is a basic example which shows you how to fetch trades data for a particular market:
 
@@ -46,3 +46,10 @@ ftx_trades(key = "", secret = "", market = "FTM-PERP")
 
 ```
 
+This is another example which shows you how to fetch future funding rates data for two markets:
+
+```{r example2, message=FALSE}
+## second example code
+ftx_future_funding_rates(key = "", secret = "", markets = c('CRV-PERP','XRP-PERP'))
+
+```
