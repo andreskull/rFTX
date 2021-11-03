@@ -68,11 +68,7 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
 result_formatter <- function(result, time_label, tz){
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate("{time_label}" := if(time_label %in% names(.))
-        as.POSIXct(gsub("(.*):", "\\1", get(time_label)), format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz) else NULL)
+    df <- format_helper(x[[1]], time_label, tz)
   }
   ))
   
