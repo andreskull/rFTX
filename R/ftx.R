@@ -67,7 +67,7 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
 
 result_formatter <- function(result, time_label, tz){
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
     df <- x[[1]] %>%
       replace(lengths(.) == 0, NA) %>% 
       tibble::as_tibble() %>%
@@ -153,19 +153,15 @@ ftx_positions <- function(key, secret, subaccount = NA, ...) {
 #' @title FTX Coin Markets
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_coin_markets <- function(key, secret, ...) {
+ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
   # GET /markets
   response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
   
   return_obj <- list(
     success = response$success,
@@ -324,7 +320,9 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
   if(!is.na(market) & length(market) == 1){
     df <- result %>%
       replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
+      tibble::as_tibble() %>%
+      mutate(expiry = as.POSIXct(gsub("(.*):", "\\1", expiry), 
+                                          format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
   }
   return_obj <- list(
     success = response$success,
