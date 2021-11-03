@@ -181,8 +181,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rFTX, <span class="at">quietly =</span> T)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># example use</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">ftx_coin_balances</span>(<span class="at">key =</span> <span class="st">&quot;LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm&quot;</span>, </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                         <span class="at">secret =</span> <span class="st">&quot;T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2&quot;</span>)</span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">ftx_send_request</span>(<span class="at">method =</span> <span class="st">&quot;GET&quot;</span>, <span class="at">path =</span> <span class="st">&quot;/api/funding_rates&quot;</span>, <span class="at">key =</span> <span class="st">&quot;&quot;</span>, <span class="at">secret =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <p>Further instructions on functions can be accessed via <code>vignette(&quot;rFTX-Functionality&quot;)</code>.</p>
 </div>
 

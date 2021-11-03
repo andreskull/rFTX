@@ -53,13 +53,12 @@ install.packages(httr)
 
 To test the connection with the coin balances function, the below code is used. The object returned should be a list of 3: success (TRUE or FALSE), failure_reason (if success is FALSE, then reason for failure) and the result, which is data in a tibble, if success is TRUE. A Not logged in error means that authentication failed.  
 
-```{r, eval=FALSE, message=FALSE}
+```{r, message=FALSE}
 # loading the library
 library(rFTX, quietly = T)
 
 # example use
-obj <- ftx_coin_balances(key = "LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm", 
-                         secret = "T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2")
+obj <- ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 
 ```
 

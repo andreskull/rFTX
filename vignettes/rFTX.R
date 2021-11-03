@@ -16,12 +16,11 @@
 #  install.packages(httr)
 #  
 
-## ---- eval=FALSE, message=FALSE-----------------------------------------------
-#  # loading the library
-#  library(rFTX, quietly = T)
-#  
-#  # example use
-#  obj <- ftx_coin_balances(key = "LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm",
-#                           secret = "T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2")
-#  
+## ---- message=FALSE-----------------------------------------------------------
+# loading the library
+library(rFTX, quietly = T)
+
+# example use
+obj <- ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
+
 
