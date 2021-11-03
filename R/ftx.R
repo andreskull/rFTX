@@ -286,6 +286,7 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 }
 
 #' @title FTX Historical Prices
+#' @description Returns historical prices of expired futures
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
@@ -293,7 +294,10 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: if success is FALSE, NA otherwise, 
+#' data: a tibble with the following fields: close, high, low, open, startTime, volume
+#' @examples ftx_historical_prices(key, secret, market = "1INCH/USD")
 
 ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
