@@ -1,0 +1,188 @@
+---
+title: "rFTX requests"
+author: "Andres Kull"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rFTX requests}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+This document describes the set of functions found in the rFTX package and how to use them. A helper function `ftx_send_request` is used by all functions to connect to the API. 
+
+## Fetching information
+
+### Coin Balances
+
+This function returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts. The data element in the response list will contain a column with the subaccount names. The main account values will appear under the name main.
+
+```{r, message=FALSE, eval=FALSE}
+# Loading the library
+library(rFTX)
+
+# API key and secret
+key <- "LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm"
+secret <- "T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2"
+
+obj <- ftx_coin_balances(key, secret, accounts = c())
+
+```
+
+### Positions
+
+This function returns the account positions and takes subaccount as an optional argument. 
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_positions(key, secret, subaccount=NA)
+
+```
+
+### Coin Markets
+
+This function returns information on all types of markets on FTX: spot, perpetual futures, expiring futures, and MOVE contracts. For futures that expired in 2019, prepend a 2019 to the date, like so: BTC-20190628 or BTC-MOVE-20190923. 
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_coin_markets(key, secret)
+
+```
+
+### Orderbook
+
+This function returns the orderbook for the market specified. The name of the market is required. The maximum depth is 100.
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_orderbook(key, secret, market = NA, depth = 10)
+
+```
+
+### Trades
+
+This function returns the trades that have taken place for a particular market. Start and end time arguments are optional.
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_trades(key, secret, market, start_time = NA, end_time = NA)
+
+```
+
+### Historical Prices
+
+This function returns historical prices of expired futures. Start and end time arguments are optional.
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_historical_prices(key, secret, market, resolution = 14400, start_time = NA, end_time = NA)
+
+```
+
+### Future Markets
+
+This function returns all types of futures on FTX: perpetual, expiring, and MOVE. Examples for each type are BTC-PERP, BTC-0626, and BTC-MOVE-1005. For futures that expired in 2019, prepend a 2019 to the date, like so: BTC-20190628.
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_future_markets(key, secret, market = NA)
+
+```
+
+### Future Stats
+
+This function returns stats on futures such as volume which is quantity traded in the last 24 hours.
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_future_stat(key, secret, market) 
+
+```
+
+### Future Funding Rates
+
+This function returns the funding rates of futures.
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_future_funding_rates(key, secret, markets=c(), start_time, end_time)
+
+```
+
+### Open Orders
+
+This function returns information on the account or subaccount open orders along with their statuses such as new (accepted but not processed yet), open, or closed (filled or cancelled).
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_open_orders(key, secret, subaccount, markets=c())
+
+```
+
+### Orders History
+
+This function returns 
+
+```{r, message=FALSE, eval=FALSE}
+obj <- ftx_orders_history(key, secret, subaccount, markets=c())
+
+```
+
+### Place Order
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Modify Order
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+#### Modify order by clientID
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Order Status
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+#### Order Status by clientID
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Cancel Order
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+#### Cancel Order by clientID
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Order Fills
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Funding Payments
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Spot Lending History
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Spot Margin Borrow Rates
+
+```{r, message=FALSE, eval=FALSE}
+```
+
+### Spot Borrow History
+
+```{r, message=FALSE, eval=FALSE}
+```
