@@ -31,8 +31,13 @@ ftx_order_fills(
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Orders Fills
+Returns market fills
+}
+\examples{
+ftx_order_fills(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 }

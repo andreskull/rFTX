@@ -49,8 +49,14 @@ ftx_place_order(
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Place Order
+Places an order based on the information provided
+}
+\examples{
+ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3, 
+reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
 }

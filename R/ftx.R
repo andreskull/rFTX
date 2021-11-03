@@ -21,7 +21,7 @@ base_url <- "https://ftx.com"
 #' @param body Only for POST method. A named list of values containing market name (string), 
 #' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
 #' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
-#' @return A list of response object containing two elements, a logical vector success of 1 length and 
+#' @return A response object as a list containing two elements, a logical vector success of 1 length and 
 #' either an error element if success is FALSE or result list if success is TRUE.,
 #' @examples ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 
@@ -105,8 +105,8 @@ format_helper <- function(list, time_label, tz){
 #' @param secret A client's secret
 #' @param accounts Optional parameter. A vector of client sub-accounts
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
-#' failure_reason: if success is FALSE, NA otherwise, 
-#' data: a tibble with the following fields: coin, free, spotBorrow, total, usdValue, availableWithoutBorrow
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
 #' @examples ftx_coin_balances(key, secret, accounts = c())
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
@@ -147,11 +147,8 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 #' @param subaccount A client's subaccount
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
-#' failure_reason: if success is FALSE, NA otherwise, 
-#' data: a tibble with the following fields: cost, cumulativeBuySize, cumulativeSellSize, 
-#' entryPrice, estimatedLiquidationPrice, future, initialMarginRequirement, longOrderSize,
-#' maintenanceMarginRequirement, netSize, openSize, realizedPnl, recentAverageOpenPrice, 
-#' recentBreakEvenPrice, recentPnl, shortOrderSize, side, size, unrealizedPnl, collateralUsed
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
 #' @examples ftx_positions(key, secret, subaccount=NA)
 
 ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
@@ -180,11 +177,8 @@ ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
 #' @param secret A client's secret
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
-#' failure_reason: if success is FALSE, NA otherwise, 
-#' data: a tibble with the following fields: name, baseCurrency, quoteCurrency,
-#' quoteVolume24h, change1h, change24h, changeBod, highLeverageFeeExempt, minProvideSize, 
-#' type, underlying, enabled, ask, bid, last, postOnly, price, priceIncrement, sizeIncrement, 
-#' restricted, volumeUsd24h
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
 #' @examples ftx_coin_markets(key, secret)
 
 ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
@@ -209,8 +203,8 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 #' @param market Name of market
 #' @param depth Market depth. Min 1, Max 100, default 5
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
-#' failure_reason: if success is FALSE, NA otherwise, 
-#' data: a tibble with the following fields: price, size and name
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
 #' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
 
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
@@ -247,8 +241,8 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
-#' failure_reason: if success is FALSE, NA otherwise, 
-#' data: a tibble with the following fields: id, liquidation, price, side, size, time
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
 #' @examples ftx_trades(key, secret, market = "1INCH/USD")
 
 ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -295,8 +289,8 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
-#' failure_reason: if success is FALSE, NA otherwise, 
-#' data: a tibble with the following fields: close, high, low, open, startTime, volume
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
 #' @examples ftx_historical_prices(key, secret, market = "1INCH/USD")
 
 ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -342,11 +336,15 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
 }
 
 #' @title FTX Future Markets
+#' @description Returns all types of futures on FTX
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_future_markets(key, secret)
 
 ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
   # GET /futures (if market == NA)
@@ -372,11 +370,15 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
 }
 
 #' @title FTX Future Stats
+#' @description Returns stats on futures 
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_future_stat(key, secret, market = "CRV-PERP") 
 
 ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
   # GET /futures/{market}/stats
@@ -396,13 +398,17 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
 }
 
 #' @title FTX Future Funding Rates
+#' @description Returns the funding rates of futures
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_future_funding_rates(key, secret, markets=c('CRV-PERP','XRP-PERP'))
 
 ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /funding_rates
@@ -442,12 +448,16 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
 }
 
 #' @title FTX Open Orders
+#' @description Returns information on the open orders for account or subaccount if specified
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_open_orders(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 
 ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
   # GET /orders?market={market}
@@ -471,12 +481,16 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
 }
 
 #' @title FTX Orders History
+#' @description Returns the history of orders for the account or subaccount if specified
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_orders_history(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 
 ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
   # GET /orders/history?market={market}
@@ -500,6 +514,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 }
 
 #' @title FTX Place Order
+#' @description Places an order based on the information provided
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
@@ -513,7 +528,11 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @param postOnly optional; default is false
 #' @param clientId optional; client order id
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3, 
+#' reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
 
 ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA, tz = "GMT", ...) {
   # POST /orders
@@ -557,6 +576,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 }
 
 #' @title FTX Modify Order
+#' @description Modifies an order's size and price
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
@@ -564,7 +584,10 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 #' @param size Size of order
 #' @param price Price of order 
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_modify_order(key, secret, subaccount, order_id, size, price)
 
 ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz = "GMT", ...) {
   # POST /orders/{order_id}/modify
@@ -595,12 +618,16 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
 }
 
 #' @title FTX Order Status
+#' @description Returns the status of orders
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_order_status(key, secret, subaccount, order_id)
 
 ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...) {
   # GET /orders/by_client_id/{client_order_id}
@@ -626,11 +653,15 @@ ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...)
 }
 
 #' @title FTX Cancel Order
+#' @description Queues an order for cancellation
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
-#' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' result: if success is TRUE: "Order queued for cancellation"
+#' @examples ftx_cancel_order(key, secret, subaccount, order_id)
 
 ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
   # DELETE /orders/{order_id}
@@ -646,6 +677,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 }
 
 #' @title FTX Modify Order by Client ID
+#' @description Modifies an order using the client ID instead of the order ID
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
@@ -653,7 +685,10 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param size Size of order
 #' @param price Price of order 
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_modify_order_clientid(key, secret, subaccount, client_id, new_client_id, size, price)
 
 ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, price, tz = "GMT", ...) {
   # POST /orders/by_client_id/{client_order_id}/modify
@@ -684,12 +719,16 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
 }
 
 #' @title FTX Order Status by Client ID
+#' @description Returns the status of orders using the client ID instead of the order ID
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Numeric value of client order ID
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_order_status_clientid(key, secret, subaccount, client_id)
 
 ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "GMT", ...) {
   # GET /orders/by_client_id/{client_order_id}
@@ -715,11 +754,15 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
 }
 
 #' @title FTX Cancel Order by Client ID
+#' @description Queues an order for cancellation using the client ID instead of the order ID
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Numeric value of client order ID
-#' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' result: if success is TRUE: "Order queued for cancellation"
+#' @examples ftx_cancel_order_clientid(key, secret, subaccount, client_id)
 
 ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
   # DELETE /orders/by_client_id/{client_order_id}
@@ -735,6 +778,7 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 }
 
 #' @title FTX Orders Fills
+#' @description Returns market fills
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
@@ -742,7 +786,10 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_order_fills(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 
 ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /fills?market={market} 
@@ -781,13 +828,17 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 }
 
 #' @title FTX Funding Payments
+#' @description Returns the funding payments for futures
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_funding_payments(key, secret, subaccount)
 
 ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /funding_payments
@@ -819,12 +870,16 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 }
 
 #' @title FTX Spot Lending History
+#' @description Returns the lending history for coins
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_spot_lending_history(key, secret)
 
 ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /spot_margin/history
@@ -857,11 +912,15 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
 }
 
 #' @title FTX Spot Margin Borrow Rates
+#' @description Returns the estimated hourly borrow rate for the next spot margin cycle and the hourly borrow rate in the previous spot margin cycle for coins.
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_spot_margin_borrow_rates(key, secret, subaccount)
 
 ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
   # GET /spot_margin/borrow_rates
@@ -879,13 +938,17 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ..
 }
 
 #' @title FTX Spot Borrow History
+#' @description Returns the coin borrow history for the user
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_my_spot_borrow_history(key, secret, subaccount)
 
 ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /spot_margin/borrow_history

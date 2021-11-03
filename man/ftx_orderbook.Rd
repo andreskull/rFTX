@@ -17,8 +17,8 @@ ftx_orderbook(key, secret, market = NA, depth = 5, ...)
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
-failure_reason: if success is FALSE, NA otherwise,
-data: a tibble with the following fields: price, size and name
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
 Returns the orderbook for the market specified

@@ -17,11 +17,8 @@ ftx_positions(key, secret, subaccount = NA, tz = "GMT", ...)
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
-failure_reason: if success is FALSE, NA otherwise,
-data: a tibble with the following fields: cost, cumulativeBuySize, cumulativeSellSize,
-entryPrice, estimatedLiquidationPrice, future, initialMarginRequirement, longOrderSize,
-maintenanceMarginRequirement, netSize, openSize, realizedPnl, recentAverageOpenPrice,
-recentBreakEvenPrice, recentPnl, shortOrderSize, side, size, unrealizedPnl, collateralUsed
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
 Returns the account positions

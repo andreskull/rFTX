@@ -15,8 +15,8 @@ ftx_coin_balances(key, secret, accounts = c(), ...)
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
-failure_reason: if success is FALSE, NA otherwise,
-data: a tibble with the following fields: coin, free, spotBorrow, total, usdValue, availableWithoutBorrow
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
 Returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts.

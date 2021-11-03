@@ -22,7 +22,7 @@ side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "marke
 reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)}
 }
 \value{
-A list of response object containing two elements, a logical vector success of 1 length and
+A response object as a list containing two elements, a logical vector success of 1 length and
 either an error element if success is FALSE or result list if success is TRUE.,
 }
 \description{

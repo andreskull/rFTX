@@ -29,8 +29,8 @@ ftx_trades(
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
-failure_reason: if success is FALSE, NA otherwise,
-data: a tibble with the following fields: id, liquidation, price, side, size, time
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
 Returns the trades that have taken place for a particular market

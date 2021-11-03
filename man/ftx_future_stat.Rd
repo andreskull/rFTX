@@ -16,8 +16,13 @@ ftx_future_stat(key, secret, market, tz = "GMT", ...)
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Future Stats
+Returns stats on futures
+}
+\examples{
+ftx_future_stat(key, secret, market = "CRV-PERP") 
 }

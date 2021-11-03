@@ -15,11 +15,8 @@ ftx_coin_markets(key, secret, tz = "GMT", ...)
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
-failure_reason: if success is FALSE, NA otherwise,
-data: a tibble with the following fields: name, baseCurrency, quoteCurrency,
-quoteVolume24h, change1h, change24h, changeBod, highLeverageFeeExempt, minProvideSize,
-type, underlying, enabled, ask, bid, last, postOnly, price, priceIncrement, sizeIncrement,
-restricted, volumeUsd24h
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
 Returns information on all types of markets on FTX
