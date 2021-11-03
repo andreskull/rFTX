@@ -124,24 +124,21 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_positions <- function(key, secret, subaccount = NA, ...) {
+ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
   # GET /positions
   response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, ...)
   result = response$result
   
   if(length(result) > 0){
-    df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-      df <- x[[1]] %>%
-        replace(lengths(.) == 0, NA)  %>% 
-        tibble::as_tibble() %>%
-        filter(size != 0)
-    }
-    ))
+    df <- result_formatter(result, "time", tz) %>% 
+      filter(size != 0)
   } else {
     df <- tibble()
   }
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
