@@ -14,8 +14,16 @@ ftx_coin_markets(key, secret, tz = "GMT", ...)
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: if success is FALSE, NA otherwise,
+data: a tibble with the following fields: name, baseCurrency, quoteCurrency,
+quoteVolume24h, change1h, change24h, changeBod, highLeverageFeeExempt, minProvideSize,
+type, underlying, enabled, ask, bid, last, postOnly, price, priceIncrement, sizeIncrement,
+restricted, volumeUsd24h
 }
 \description{
-FTX Coin Markets
+Returns information on all types of markets on FTX
+}
+\examples{
+ftx_coin_markets(key, secret)
 }

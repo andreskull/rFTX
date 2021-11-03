@@ -175,10 +175,17 @@ ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
 }
 
 #' @title FTX Coin Markets
+#' @description Returns information on all types of markets on FTX
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: if success is FALSE, NA otherwise, 
+#' data: a tibble with the following fields: name, baseCurrency, quoteCurrency,
+#' quoteVolume24h, change1h, change24h, changeBod, highLeverageFeeExempt, minProvideSize, 
+#' type, underlying, enabled, ask, bid, last, postOnly, price, priceIncrement, sizeIncrement, 
+#' restricted, volumeUsd24h
+#' @examples ftx_coin_markets(key, secret)
 
 ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
   # GET /markets
