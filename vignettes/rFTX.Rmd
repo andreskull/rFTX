@@ -9,14 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-
 The FTX API is described as a HTTP-based API with full trading and asset management functionality, with public orderbook and trades data as well as private account data and order management.
 
 This document introduces the user to how to set up to use the package.
@@ -28,8 +20,10 @@ This package provides a way of making GET, POST and DELETE requests in R via the
 To use this package, you'll need to install it from GitHub or CRAN:
 
 ```{r, eval = FALSE}
+# from GitHub
 devtools::install_github("rFTX")
 
+# from CRAN
 install.packages("rFTX")
 
 ```
@@ -60,10 +54,13 @@ install.packages(httr)
 To test the connection with the coin balances function, the below code is used. The object returned should be a list of 3: success (TRUE or FALSE), failure_reason (if success is FALSE, then reason for failure) and the result, which is data in a tibble, if success is TRUE. A Not logged in error means that authentication failed.  
 
 ```{r, eval=FALSE, message=FALSE}
+# loading the library
 library(rFTX, quietly = T)
+
+# example use
 obj <- ftx_coin_balances(key = "LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm", 
                          secret = "T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2")
 
 ```
 
-Further instructions on functions can be accessed via `vignette("rFTX requests")`.
+Further instructions on functions can be accessed via `vignette("rFTX-Functionality")`.
