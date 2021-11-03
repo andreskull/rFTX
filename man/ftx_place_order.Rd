@@ -17,6 +17,7 @@ ftx_place_order(
   ioc = FALSE,
   postOnly = FALSE,
   clientId = NA,
+  tz = "GMT",
   ...
 )
 }

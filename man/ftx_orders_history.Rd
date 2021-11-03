@@ -4,7 +4,7 @@
 \alias{ftx_orders_history}
 \title{FTX Orders History}
 \usage{
-ftx_orders_history(key, secret, subaccount, markets = c(), ...)
+ftx_orders_history(key, secret, subaccount, markets = c(), tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}

@@ -4,7 +4,15 @@
 \alias{ftx_trades}
 \title{FTX Trades}
 \usage{
-ftx_trades(key, secret, market, start_time = NA, end_time = NA, ...)
+ftx_trades(
+  key,
+  secret,
+  market,
+  start_time = NA,
+  end_time = NA,
+  tz = "GMT",
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}
@@ -16,6 +24,8 @@ ftx_trades(key, secret, market, start_time = NA, end_time = NA, ...)
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
+
+\item{tz}{Timezone to display. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

@@ -10,6 +10,7 @@ ftx_funding_payments(
   subaccount,
   start_time = NA,
   end_time = NA,
+  tz = "GMT",
   ...
 )
 }

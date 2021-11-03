@@ -11,6 +11,7 @@ ftx_order_fills(
   markets = c(),
   start_time = NA,
   end_time = NA,
+  tz = "GMT",
   ...
 )
 }

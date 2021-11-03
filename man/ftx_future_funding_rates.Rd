@@ -4,7 +4,15 @@
 \alias{ftx_future_funding_rates}
 \title{FTX Future Funding Rates}
 \usage{
-ftx_future_funding_rates(key, secret, markets = c(), start_time, end_time, ...)
+ftx_future_funding_rates(
+  key,
+  secret,
+  markets = c(),
+  start_time = NA,
+  end_time = NA,
+  tz = "GMT",
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}

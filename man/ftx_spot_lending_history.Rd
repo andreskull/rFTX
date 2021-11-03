@@ -4,7 +4,14 @@
 \alias{ftx_spot_lending_history}
 \title{FTX Spot Lending History}
 \usage{
-ftx_spot_lending_history(key, secret, start_time = NA, end_time = NA, ...)
+ftx_spot_lending_history(
+  key,
+  secret,
+  start_time = NA,
+  end_time = NA,
+  tz = "GMT",
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}
