@@ -22,13 +22,9 @@ The goal of rFTX is to provide a way of making GET, POST and DELETE requests in 
 
 ## Installation
 
-You can install the released version of rFTX from [CRAN](https://CRAN.R-project.org) with:
+rFTX package is not yet on CRAN but it will soon be.
 
-``` r
-install.packages("rFTX")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
