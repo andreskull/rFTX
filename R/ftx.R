@@ -1,4 +1,4 @@
-#' @exportPattern ^[[:alpha:]]+
+#' @exportPattern ("^ftx_.*$")
 #'
 
 library(tidyverse)
@@ -59,13 +59,6 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   response
 }
 
-#' @title Result Formatter
-#' @description A helper function
-#' @param result The result of an API response
-#' @param time_label time column to be formatted to POSIXct
-#' @param tz Timezone to display times in. Default is GMT.
-#' @return A formatted tibble
-
 result_formatter <- function(result, time_label, tz){
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -75,13 +68,6 @@ result_formatter <- function(result, time_label, tz){
   
   return(df)
 }
-
-#' @title Helper Function for the Formatter
-#' @description A helper function
-#' @param list A list or section of list from API response
-#' @param time_label time column to be formatted to POSIXct
-#' @param tz Timezone to display times in. Default is GMT.
-#' @return A formatted tibble
 
 format_helper <- function(list, time_label, tz){
   df <- list %>%
