@@ -354,10 +354,7 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
-  df <- result %>%
-    tibble::as_tibble() %>%
-    mutate(nextFundingTime = as.POSIXct(gsub("(.*):", "\\1", nextFundingTime), 
-                                        format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+  df <- format_helper(result, "nextFundingTime", tz)
   
   return_obj <- list(
     success = response$success,
@@ -518,11 +515,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
-  df <- result %>%
-    replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -560,11 +553,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
-  df <- result %>%
-    replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -595,10 +584,7 @@ ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...)
     else x
   })
   
-  df <- result %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -656,11 +642,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
-  df <- result %>%
-    replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -691,10 +673,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
     else x
   })
   
-  df <- result %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
