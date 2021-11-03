@@ -1,0 +1,65 @@
+---
+title: "rFTX"
+author: "Andres Kull"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rFTX}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The FTX API is described as a HTTP-based API with full trading and asset management functionality, with public orderbook and trades data as well as private account data and order management.
+
+This document introduces the user to how to set up to use the package.
+
+This package provides a way of making GET, POST and DELETE requests in R via the FTX REST API. It provides a set of functions that can perform said functionality. The user is required to have an FTX account as the account's API key and secret key is used in authentication. These can be created here: https://ftx.com/profile. If you are using a subaccount, some functions allow the name as an argument. This can be left out if not using subaccounts. 
+
+## Setting up
+
+To use this package, you'll need to install it from GitHub or CRAN:
+
+```{r, eval = FALSE}
+# from GitHub
+devtools::install_github("rFTX")
+
+# from CRAN
+install.packages("rFTX")
+
+```
+
+The package also has dependencies which require to be installed. 
+
+* tidyverse to easily install and load data manipulation packages
+* digest to create hash function digests
+* lubridate for date processing
+* stringi for string processing
+* assert for assertions and argument validation
+* logging for generating log records
+* httr for making REST API requests
+
+```{r, eval=FALSE}
+install.packages(tidyverse)
+install.packages(digest)
+install.packages(lubridate)
+install.packages(stringi)
+install.packages(assert)
+install.packages(logging)
+install.packages(httr)
+
+```
+
+## Connecting to FTX API
+
+To test the connection with the coin balances function, the below code is used. The object returned should be a list of 3: success (TRUE or FALSE), failure_reason (if success is FALSE, then reason for failure) and the result, which is data in a tibble, if success is TRUE. A Not logged in error means that authentication failed.  
+
+```{r, message=FALSE}
+# loading the library
+library(rFTX, quietly = T)
+
+# example use
+obj <- ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
+
+```
+
+Further instructions on functions can be accessed via `vignette("rFTX-Functionality")`.

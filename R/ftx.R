@@ -686,6 +686,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+
 #' @param client_id Numeric value of client order ID
 #' @param new_client_id Character string of new client order ID
 #' @param size Size of order
@@ -734,7 +735,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_cl
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param client_id Numeric value of client order ID
+#' @param client_id Character string of client order ID
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
@@ -769,7 +770,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param client_id Numeric value of client order ID
+#' @param client_id Character string of client order ID
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' result: if success is TRUE: "Order queued for cancellation"
