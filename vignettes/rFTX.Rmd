@@ -16,50 +16,54 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+The FTX API is described as a HTTP-based API with full trading and asset management functionality, with public orderbook and trades data as well as private account data and order management.
 
-## Vignette Info
+This document introduces the user to how to set up to use the package.
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+This package provides a way of making GET, POST and DELETE requests in R via the FTX REST API. It provides a set of functions that can perform said functionality. The user is required to have an FTX account as the account's API key and secret key is used in authentication. These can be created here: https://ftx.com/profile. If you are using a subaccount, some functions allow the name as an argument. This can be left out if not using subaccounts. 
 
-## Styles
+## Setting up
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+To use this package, you'll need to install it from GitHub or CRAN:
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+```{r, eval = FALSE}
+devtools::install_github("rFTX")
 
-## Figures
+install.packages("rFTX")
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+The package also has dependencies which require to be installed. 
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+* tidyverse to easily install and load data manipulation packages
+* digest to create hash function digests
+* lubridate for date processing
+* stringi for string processing
+* assert for assertions and argument validation
+* logging for generating log records
+* httr for making REST API requests
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+```{r, eval=FALSE}
+install.packages(tidyverse)
+install.packages(digest)
+install.packages(lubridate)
+install.packages(stringi)
+install.packages(assert)
+install.packages(logging)
+install.packages(httr)
 
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
 ```
 
-Also a quote using `>`:
+## Connecting to FTX API
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+To test the connection with the coin balances function, the below code is used. The object returned should be a list of 3: success (TRUE or FALSE), failure_reason (if success is FALSE, then reason for failure) and the result, which is data in a tibble, if success is TRUE. A Not logged in error means that authentication failed.  
+
+```{r, eval=FALSE, message=FALSE}
+library(rFTX, quietly = T)
+obj <- ftx_coin_balances(key = "LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm", 
+                         secret = "T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2")
+
+```
+
+Further instructions on functions can be accessed via `vignette("rFTX requests")`.
