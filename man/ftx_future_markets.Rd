@@ -4,7 +4,7 @@
 \alias{ftx_future_markets}
 \title{FTX Future Markets}
 \usage{
-ftx_future_markets(key, secret, market = NA, ...)
+ftx_future_markets(key, secret, market = NA, tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}
