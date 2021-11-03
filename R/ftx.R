@@ -237,14 +237,8 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -294,14 +288,8 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(startTime = as.POSIXct(gsub("(.*):", "\\1", startTime), 
-                                    format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "startTime")
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -326,14 +314,7 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(expiry = as.POSIXct(gsub("(.*):", "\\1", expiry), 
-                                 format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "expiry")
   
   if(!is.na(market) & length(market) == 1){
     df <- result %>%
@@ -405,14 +386,8 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(future %in% markets)
@@ -439,15 +414,8 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                    format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-    
-  }
-  ))
+  df <- result_formatter(result, "createdAt")
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
@@ -474,14 +442,8 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                    format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "createdAt")
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
@@ -773,14 +735,8 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
@@ -820,14 +776,8 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
                               subaccount, query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -863,14 +813,8 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -890,12 +834,8 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ...) {
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_rates', key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -931,14 +871,8 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, e
                               subaccount, query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
-  }
-  ))
+  df <- result_formatter(result, "time")
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
