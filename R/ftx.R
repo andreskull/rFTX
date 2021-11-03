@@ -364,7 +364,7 @@ ftx_future_stat <-  function(key, secret, market, ...) {
 #' @param end_time POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_time, ...) {
+ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, ...) {
   # GET /funding_rates
   # checks on start and end times
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
@@ -894,7 +894,7 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ...) {
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time, end_time, ...) {
+ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, ...) {
   # GET /spot_margin/borrow_history
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
