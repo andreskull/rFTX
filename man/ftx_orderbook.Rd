@@ -16,8 +16,13 @@ ftx_orderbook(key, secret, market = NA, depth = 5, ...)
 \item{depth}{Market depth. Min 1, Max 100, default 5}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: if success is FALSE, NA otherwise,
+data: a tibble with the following fields: price, size and name
 }
 \description{
-FTX Orderbook
+Returns the orderbook for the market specified
+}
+\examples{
+ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
 }
