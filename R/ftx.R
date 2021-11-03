@@ -203,11 +203,15 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 }
 
 #' @title FTX Orderbook
+#' @description Returns the orderbook for the market specified
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param depth Market depth. Min 1, Max 100, default 5
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: if success is FALSE, NA otherwise, 
+#' data: a tibble with the following fields: price, size and name
+#' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 10)
 
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
