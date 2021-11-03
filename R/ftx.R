@@ -209,10 +209,10 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret, 
@@ -266,10 +266,10 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret,
@@ -377,10 +377,10 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret,
@@ -745,10 +745,10 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
@@ -793,10 +793,10 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, 
                               subaccount, query = query_list, ...)
@@ -835,10 +835,10 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, 
@@ -904,10 +904,10 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, e
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, 
                               subaccount, query = query_list, ...)
