@@ -19,7 +19,7 @@ base_url <- "https://ftx.com"
 #' @param subaccount A client's subaccount
 #' @param body Only for POST method. A named list of values containing market name (string), 
 #' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
-#' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
+#' reduceOnly (logical), ioc (logical), postOnly (logical) and client_id/ new_client_id (numeric or NA)
 #' @return A response returned by request using specified method.
 
 ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
@@ -479,11 +479,12 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @param reduceOnly optional; default is false
 #' @param ioc optional; default is false
 #' @param postOnly optional; default is false
-#' @param clientId optional; client order id
+#' @param client_id optional; client order id
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA, tz = "GMT", ...) {
+ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT", ...) {
+
   # POST /orders
   # check if side, price, type, size, reduce_only, ioc, postonly parameters are correct
   path = paste0('/api/orders')
@@ -510,7 +511,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   if(reduceOnly %in% c(T,F)) body$reduceOnly = reduceOnly
   if(ioc %in% c(T,F)) body$ioc = ioc
   if(postOnly %in% c(T,F)) body$postOnly = postOnly
-  body$clientId = clientId
+  body$clientId = client_id
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
@@ -618,12 +619,14 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Numeric value of client order ID
+#' @param new_client_id Character string of new client order ID
 #' @param size Size of order
 #' @param price Price of order 
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, price, tz = "GMT", ...) {
+ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, tz = "GMT", ...) {
+
   # POST /orders/by_client_id/{client_order_id}/modify
   path = paste0('/api/orders/by_client_id/', client_id, '/modify')
   body <- list()
@@ -636,6 +639,10 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
     if(is.numeric(price) | is.null(price)){
       body$price = price
     }
+  }
+  
+  if(!missing(client_id)){
+    body$clientId = new_client_id
   }
   
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
