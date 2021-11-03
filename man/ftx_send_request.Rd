@@ -22,8 +22,12 @@ side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "marke
 reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)}
 }
 \value{
-A response returned by request using specified method.
+A response object as a list containing two elements, a logical vector success of 1 length and
+either an error element if success is FALSE or result list if success is TRUE.,
 }
 \description{
-FTX Send Request
+A helper function
+}
+\examples{
+ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 }

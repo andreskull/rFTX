@@ -14,8 +14,13 @@ ftx_coin_balances(key, secret, accounts = c(), ...)
 \item{accounts}{Optional parameter. A vector of client sub-accounts}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Coin Balances
+Returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts.
+}
+\examples{
+ftx_coin_balances(key, secret, accounts = c())
 }

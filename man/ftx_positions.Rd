@@ -4,7 +4,7 @@
 \alias{ftx_positions}
 \title{FTX Positions}
 \usage{
-ftx_positions(key, secret, subaccount = NA, ...)
+ftx_positions(key, secret, subaccount = NA, tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}
@@ -12,10 +12,17 @@ ftx_positions(key, secret, subaccount = NA, ...)
 \item{secret}{A client's secret}
 
 \item{subaccount}{A client's subaccount}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Positions
+Returns the account positions
+}
+\examples{
+ftx_positions(key, secret, subaccount=NA)
 }

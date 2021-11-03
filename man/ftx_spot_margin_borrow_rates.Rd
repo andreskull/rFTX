@@ -4,7 +4,7 @@
 \alias{ftx_spot_margin_borrow_rates}
 \title{FTX Spot Margin Borrow Rates}
 \usage{
-ftx_spot_margin_borrow_rates(key, secret, subaccount, ...)
+ftx_spot_margin_borrow_rates(key, secret, subaccount, tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}
@@ -12,10 +12,17 @@ ftx_spot_margin_borrow_rates(key, secret, subaccount, ...)
 \item{secret}{A client's secret}
 
 \item{subaccount}{A client's subaccount}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Spot Margin Borrow Rates
+Returns the estimated hourly borrow rate for the next spot margin cycle and the hourly borrow rate in the previous spot margin cycle for coins.
+}
+\examples{
+ftx_spot_margin_borrow_rates(key, secret, subaccount)
 }

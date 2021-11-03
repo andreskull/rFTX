@@ -12,6 +12,7 @@ library(httr)
 base_url <- "https://ftx.com"
 
 #' @title FTX Send Request
+#' @description A helper function
 #' @param method REST API Method such as GET or POST
 #' @param path An additional path defined for each function
 #' @param key A client's key
@@ -19,8 +20,11 @@ base_url <- "https://ftx.com"
 #' @param subaccount A client's subaccount
 #' @param body Only for POST method. A named list of values containing market name (string), 
 #' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
-#' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
-#' @return A response returned by request using specified method.
+#' reduceOnly (logical), ioc (logical), postOnly (logical) and client_id/ new_client_id (numeric or NA)
+#' @return A response object as a list containing two elements, a logical vector success of 1 length and 
+#' either an error element if success is FALSE or result list if success is TRUE.,
+#' @examples ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
+
 
 ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   url <- paste0(base_url, path)
@@ -59,16 +63,52 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   response
 }
 
+#' @title Result Formatter
+#' @description A helper function
+#' @param result The result of an API response
+#' @param time_label time column to be formatted to POSIXct
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A formatted tibble
+
+result_formatter <- function(result, time_label, tz){
+  
+  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
+    df <- format_helper(x[[1]], time_label, tz)
+  }
+  ))
+  
+  return(df)
+}
+
+#' @title Helper Function for the Formatter
+#' @description A helper function
+#' @param list A list or section of list from API response
+#' @param time_label time column to be formatted to POSIXct
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A formatted tibble
+
+format_helper <- function(list, time_label, tz){
+  df <- list %>%
+    replace(lengths(.) == 0, NA) %>% 
+    tibble::as_tibble() %>%
+    mutate("{time_label}" := if(time_label %in% names(.))
+      as.POSIXct(gsub("(.*):", "\\1", get(time_label)), format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz) else NULL)
+  return(df)
+}
 
 # Functions should return result content in the form of dataframe if result is available and success
 # in case of response$success == FALSE the function should return the cause of failure if the FTX API provides it
 # Test with the real failure cases against FTX and decide case-by-case
 
 #' @title FTX Coin Balances
+#' @description Returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts.
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param accounts Optional parameter. A vector of client sub-accounts
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_coin_balances(key, secret, accounts = c())
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
@@ -102,27 +142,28 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 }
 
 #' @title FTX Positions
+#' @description Returns the account positions
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_positions(key, secret, subaccount=NA)
 
-ftx_positions <- function(key, secret, subaccount = NA, ...) {
+ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
   # GET /positions
   response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, ...)
   result = response$result
   
   if(length(result) > 0){
-    df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-      df <- x[[1]] %>%
-        replace(lengths(.) == 0, NA)  %>% 
-        tibble::as_tibble() %>%
-        filter(size != 0)
-    }
-    ))
+    df <- result_formatter(result, "time", tz) %>% 
+      filter(size != 0)
   } else {
     df <- tibble()
   }
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -132,21 +173,22 @@ ftx_positions <- function(key, secret, subaccount = NA, ...) {
 }
 
 #' @title FTX Coin Markets
+#' @description Returns information on all types of markets on FTX
 #' @param key A client's key
 #' @param secret A client's secret
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_coin_markets(key, secret)
 
-ftx_coin_markets <- function(key, secret, ...) {
+ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
   # GET /markets
   response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -156,17 +198,21 @@ ftx_coin_markets <- function(key, secret, ...) {
 }
 
 #' @title FTX Orderbook
+#' @description Returns the orderbook for the market specified
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param depth Market depth. Min 1, Max 100, default 5
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
 
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
-  if(depth > 100) loginfo(msg = 'Depth value is too large. Max value is 100.')
-  if(depth < 1) loginfo(msg = 'Depth value is too small. Min value is 1.')
+  if(depth > 100) logerror(msg = 'Depth value is too large. Max value is 100.')
+  if(depth < 1) logerror(msg = 'Depth value is too small. Min value is 1.')
   
   path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
@@ -188,14 +234,19 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 }
 
 #' @title FTX Trades
+#' @description Returns the trades that have taken place for a particular market
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_trades(key, secret, market = "1INCH/USD")
 
-ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, ...) {
+ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /markets/{market}/trades
   # add optional parameters
   path = paste0('/api/markets/', market, '/trades')
@@ -209,24 +260,18 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, ...)
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret, 
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -236,15 +281,20 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, ...)
 }
 
 #' @title FTX Historical Prices
+#' @description Returns historical prices of expired futures
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_historical_prices(key, secret, market = "1INCH/USD")
 
-ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, ...) {
+ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
   # check if resolution, start_time and end_time are correct and not contradictory, log error if not
   # check resolution parameter
@@ -266,24 +316,21 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret,
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(startTime = as.POSIXct(gsub("(.*):", "\\1", startTime), 
-                                    format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- result_formatter(result, "startTime", tz)
+  if (nrow(df)) {
+    df <- df %>% select(start_time = startTime, open, high, low, close, volume)
   }
-  ))
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -293,12 +340,17 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
 }
 
 #' @title FTX Future Markets
+#' @description Returns all types of futures on FTX
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_future_markets(key, secret)
 
-ftx_future_markets <- function(key, secret, market = NA, ...) {
+ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
   # GET /futures (if market == NA)
   # GET /futures/{market} (if market != NA)
   path = paste0('/api/futures')
@@ -308,19 +360,10 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(expiry = as.POSIXct(gsub("(.*):", "\\1", expiry), 
-                                 format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "expiry", tz)
   
   if(!is.na(market) & length(market) == 1){
-    df <- result %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
+    df <- format_helper(result, "expiry", tz)
   }
   return_obj <- list(
     success = response$success,
@@ -331,22 +374,24 @@ ftx_future_markets <- function(key, secret, market = NA, ...) {
 }
 
 #' @title FTX Future Stats
+#' @description Returns stats on futures 
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_future_stat(key, secret, market = "CRV-PERP") 
 
-ftx_future_stat <-  function(key, secret, market, ...) {
+ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
   # GET /futures/{market}/stats
 
   path = paste0('/api/futures/', market, '/stats')
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
   result = response$result
   
-  df <- result %>%
-    tibble::as_tibble() %>%
-    mutate(nextFundingTime = as.POSIXct(gsub("(.*):", "\\1", nextFundingTime), 
-                                        format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- format_helper(result, "nextFundingTime", tz)
   
   return_obj <- list(
     success = response$success,
@@ -357,14 +402,19 @@ ftx_future_stat <-  function(key, secret, market, ...) {
 }
 
 #' @title FTX Future Funding Rates
+#' @description Returns the funding rates of futures
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_future_funding_rates(key, secret, markets=c('CRV-PERP','XRP-PERP'))
 
-ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_time, ...) {
+ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /funding_rates
   # checks on start and end times
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
@@ -377,24 +427,18 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret,
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(future %in% markets)
@@ -408,28 +452,26 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time, end_
 }
 
 #' @title FTX Open Orders
+#' @description Returns information on the open orders for account or subaccount if specified
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_open_orders(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 
-ftx_open_orders <- function(key, secret, subaccount, markets=c(), ...) {
+ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
   # GET /orders?market={market}
   path = paste0('/api/orders')
   
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                    format = "%Y-%m-%dT%H:%M:%OS%z"))
-    
-  }
-  ))
+  df <- result_formatter(result, "createdAt", tz)
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
@@ -443,27 +485,26 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), ...) {
 }
 
 #' @title FTX Orders History
+#' @description Returns the history of orders for the account or subaccount if specified
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_orders_history(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 
-ftx_orders_history <- function(key, secret, subaccount, markets=c(), ...) {
+ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
   # GET /orders/history?market={market}
   path = paste0('/api/orders/history')
 
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                    format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "createdAt", tz)
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
@@ -477,6 +518,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), ...) {
 }
 
 #' @title FTX Place Order
+#' @description Places an order based on the information provided
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
@@ -488,10 +530,16 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), ...) {
 #' @param reduceOnly optional; default is false
 #' @param ioc optional; default is false
 #' @param postOnly optional; default is false
-#' @param clientId optional; client order id
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param client_id optional; client order id
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3, 
+#' reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
 
-ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA, ...) {
+ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT", ...) {
+
   # POST /orders
   # check if side, price, type, size, reduce_only, ioc, postonly parameters are correct
   path = paste0('/api/orders')
@@ -518,15 +566,11 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   if(reduceOnly %in% c(T,F)) body$reduceOnly = reduceOnly
   if(ioc %in% c(T,F)) body$ioc = ioc
   if(postOnly %in% c(T,F)) body$postOnly = postOnly
-  body$clientId = clientId
+  body$clientId = client_id
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
-  df <- result %>%
-    replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -537,15 +581,20 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 }
 
 #' @title FTX Modify Order
+#' @description Modifies an order's size and price
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
 #' @param size Size of order
 #' @param price Price of order 
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_modify_order(key, secret, subaccount, order_id, size, price)
 
-ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ...) {
+ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz = "GMT", ...) {
   # POST /orders/{order_id}/modify
   path = paste0('/api/orders/', order_id, '/modify')
   body <- list()
@@ -563,11 +612,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ...
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
-  df <- result %>%
-    replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -578,13 +623,18 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ...
 }
 
 #' @title FTX Order Status
+#' @description Returns the status of orders
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_order_status(key, secret, subaccount, order_id)
 
-ftx_order_status <- function(key, secret, subaccount, order_id, ...) {
+ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...) {
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/', order_id)
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
@@ -597,10 +647,7 @@ ftx_order_status <- function(key, secret, subaccount, order_id, ...) {
     else x
   })
   
-  df <- result %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -611,11 +658,15 @@ ftx_order_status <- function(key, secret, subaccount, order_id, ...) {
 }
 
 #' @title FTX Cancel Order
+#' @description Queues an order for cancellation
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
-#' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' result: if success is TRUE: "Order queued for cancellation"
+#' @examples ftx_cancel_order(key, secret, subaccount, order_id)
 
 ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
   # DELETE /orders/{order_id}
@@ -631,15 +682,23 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 }
 
 #' @title FTX Modify Order by Client ID
+#' @description Modifies an order using the client ID instead of the order ID
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param client_id Character string of client order ID
+
+#' @param client_id Numeric value of client order ID
+#' @param new_client_id Character string of new client order ID
 #' @param size Size of order
 #' @param price Price of order 
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_modify_order_clientid(key, secret, subaccount, client_id, new_client_id, size, price)
 
-ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, price, ...) {
+ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, tz = "GMT", ...) {
+
   # POST /orders/by_client_id/{client_order_id}/modify
   path = paste0('/api/orders/by_client_id/', client_id, '/modify')
   body <- list()
@@ -654,14 +713,14 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
     }
   }
   
+  if(!missing(client_id)){
+    body$clientId = new_client_id
+  }
+  
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
   result = response$result
   
-  df <- result %>%
-    replace(lengths(.) == 0, NA) %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -672,13 +731,18 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
 }
 
 #' @title FTX Order Status by Client ID
+#' @description Returns the status of orders using the client ID instead of the order ID
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Character string of client order ID
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_order_status_clientid(key, secret, subaccount, client_id)
 
-ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
+ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "GMT", ...) {
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/by_client_id/', client_id)
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
@@ -691,10 +755,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
     else x
   })
   
-  df <- result %>%
-    tibble::as_tibble() %>%
-    mutate(createdAt = as.POSIXct(gsub("(.*):", "\\1", createdAt), 
-                                  format = "%Y-%m-%dT%H:%M:%OS%z"))
+  df <- format_helper(result, "createdAt", tz)
   
   return_obj <- list(
     success = response$success,
@@ -705,11 +766,15 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ...) {
 }
 
 #' @title FTX Cancel Order by Client ID
+#' @description Queues an order for cancellation using the client ID instead of the order ID
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Character string of client order ID
-#' @return A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' result: if success is TRUE: "Order queued for cancellation"
+#' @examples ftx_cancel_order_clientid(key, secret, subaccount, client_id)
 
 ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
   # DELETE /orders/by_client_id/{client_order_id}
@@ -725,15 +790,20 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 }
 
 #' @title FTX Orders Fills
+#' @description Returns market fills
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_order_fills(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 
-ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, ...) {
+ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /fills?market={market} 
   path = '/api/fills'
   
@@ -745,24 +815,18 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   if(length(result) > 0 & !missing(markets)){
     df <- df %>%
       filter(market %in% markets)
@@ -776,14 +840,19 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 }
 
 #' @title FTX Funding Payments
+#' @description Returns the funding payments for futures
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_funding_payments(key, secret, subaccount)
 
-ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, ...) {
+ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /funding_payments
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
@@ -793,23 +862,17 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, 
                               subaccount, query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -819,13 +882,18 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 }
 
 #' @title FTX Spot Lending History
+#' @description Returns the lending history for coins
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_spot_lending_history(key, secret)
 
-ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, ...) {
+ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /spot_margin/history
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
@@ -835,24 +903,18 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, ..
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, 
                               query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -862,22 +924,23 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, ..
 }
 
 #' @title FTX Spot Margin Borrow Rates
+#' @description Returns the estimated hourly borrow rate for the next spot margin cycle and the hourly borrow rate in the previous spot margin cycle for coins.
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_spot_margin_borrow_rates(key, secret, subaccount)
 
-ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ...) {
+ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
   # GET /spot_margin/borrow_rates
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_rates', key, secret, subaccount, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble()
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -887,14 +950,19 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ...) {
 }
 
 #' @title FTX Spot Borrow History
+#' @description Returns the coin borrow history for the user
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples ftx_my_spot_borrow_history(key, secret, subaccount)
 
-ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time, end_time, ...) {
+ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /spot_margin/borrow_history
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
@@ -904,23 +972,17 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time, end_
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.numeric(start_time)
+    query_list['start_time'] <- as.integer(start_time)
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.numeric(end_time)
+    query_list['end_time'] <- as.integer(end_time)
   }
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, 
                               subaccount, query = query_list, ...)
   result = response$result
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- x[[1]] %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(time = as.POSIXct(gsub("(.*):", "\\1", time), 
-                               format = "%Y-%m-%dT%H:%M:%OS%z"))
-  }
-  ))
+  df <- result_formatter(result, "time", tz)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),

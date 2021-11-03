@@ -4,7 +4,15 @@
 \alias{ftx_future_funding_rates}
 \title{FTX Future Funding Rates}
 \usage{
-ftx_future_funding_rates(key, secret, markets = c(), start_time, end_time, ...)
+ftx_future_funding_rates(
+  key,
+  secret,
+  markets = c(),
+  start_time = NA,
+  end_time = NA,
+  tz = "GMT",
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}
@@ -16,10 +24,17 @@ ftx_future_funding_rates(key, secret, markets = c(), start_time, end_time, ...)
 \item{start_time}{POSIXct value from when to extract trades.}
 
 \item{end_time}{POSIXct value up-to when to extract trades.}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Future Funding Rates
+Returns the funding rates of futures
+}
+\examples{
+ftx_future_funding_rates(key, secret, markets=c('CRV-PERP','XRP-PERP'))
 }

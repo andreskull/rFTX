@@ -11,6 +11,7 @@ ftx_historical_prices(
   resolution = 14400,
   start_time = NA,
   end_time = NA,
+  tz = "GMT",
   ...
 )
 }
@@ -26,10 +27,17 @@ ftx_historical_prices(
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Historical Prices
+Returns historical prices of expired futures
+}
+\examples{
+ftx_historical_prices(key, secret, market = "1INCH/USD")
 }

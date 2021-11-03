@@ -4,7 +4,7 @@
 \alias{ftx_open_orders}
 \title{FTX Open Orders}
 \usage{
-ftx_open_orders(key, secret, subaccount, markets = c(), ...)
+ftx_open_orders(key, secret, subaccount, markets = c(), tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}
@@ -14,10 +14,17 @@ ftx_open_orders(key, secret, subaccount, markets = c(), ...)
 \item{subaccount}{A client's subaccount}
 
 \item{markets}{Vector of names of markets.}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Open Orders
+Returns information on the open orders for account or subaccount if specified
+}
+\examples{
+ftx_open_orders(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
 }

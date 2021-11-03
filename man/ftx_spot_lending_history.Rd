@@ -4,7 +4,14 @@
 \alias{ftx_spot_lending_history}
 \title{FTX Spot Lending History}
 \usage{
-ftx_spot_lending_history(key, secret, start_time = NA, end_time = NA, ...)
+ftx_spot_lending_history(
+  key,
+  secret,
+  start_time = NA,
+  end_time = NA,
+  tz = "GMT",
+  ...
+)
 }
 \arguments{
 \item{key}{A client's key}
@@ -14,10 +21,17 @@ ftx_spot_lending_history(key, secret, start_time = NA, end_time = NA, ...)
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Spot Lending History
+Returns the lending history for coins
+}
+\examples{
+ftx_spot_lending_history(key, secret)
 }

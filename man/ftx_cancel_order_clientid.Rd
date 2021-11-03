@@ -13,11 +13,17 @@ ftx_cancel_order_clientid(key, secret, subaccount, client_id, ...)
 
 \item{subaccount}{A client's subaccount}
 
+
 \item{client_id}{Character string of client order ID}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+result: if success is TRUE: "Order queued for cancellation"
 }
 \description{
-FTX Cancel Order by Client ID
+Queues an order for cancellation using the client ID instead of the order ID
+}
+\examples{
+ftx_cancel_order_clientid(key, secret, subaccount, client_id)
 }

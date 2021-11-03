@@ -16,8 +16,13 @@ ftx_cancel_order(key, secret, subaccount, order_id, ...)
 \item{order_id}{Numeric value of order ID}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, result is successful: "Order queued for cancellation"
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+result: if success is TRUE: "Order queued for cancellation"
 }
 \description{
-FTX Cancel Order
+Queues an order for cancellation
+}
+\examples{
+ftx_cancel_order(key, secret, subaccount, order_id)
 }
