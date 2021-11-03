@@ -59,6 +59,24 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   response
 }
 
+#' @title Result Formatter
+#' @param result The result of an API request
+#' @param time_label time column to be formatted to POSIXct
+#' @return A formatted tibble
+
+result_formatter <- function(result, time_label){
+  
+  df <- do.call(rbind, apply(tibble(r = result), 1, function(x) {
+    df <- x[[1]] %>%
+      replace(lengths(.) == 0, NA) %>% 
+      tibble::as_tibble() %>%
+      mutate("{time_label}" := if(time_label %in% names(.))
+        as.POSIXct(gsub("(.*):", "\\1", get(time_label)), format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz) else NULL)
+  }
+  ))
+  
+  return(df)
+}
 
 # Functions should return result content in the form of dataframe if result is available and success
 # in case of response$success == FALSE the function should return the cause of failure if the FTX API provides it
