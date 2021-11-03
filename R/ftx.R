@@ -1,4 +1,4 @@
-#' @exportPattern ("^ftx_.*$")
+#' @exportPattern (("^ftx_.*$")|("^[ftx_send_request]"))
 #'
 
 library(tidyverse)
@@ -7,20 +7,6 @@ library(logging)
 library(httr)
 
 base_url <- "https://ftx.com"
-
-#' @title FTX Send Request
-#' @description A helper function
-#' @param method REST API Method such as GET or POST
-#' @param path An additional path defined for each function
-#' @param key A client's key
-#' @param secret A client's secret
-#' @param subaccount A client's subaccount
-#' @param body Only for POST method. A named list of values containing market name (string), 
-#' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
-#' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
-#' @return A response object as a list containing two elements, a logical vector success of 1 length and 
-#' either an error element if success is FALSE or result list if success is TRUE.,
-#' @examples ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 
 ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   url <- paste0(base_url, path)
