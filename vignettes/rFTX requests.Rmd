@@ -29,7 +29,7 @@ This function returns balances coin balances of all accounts if accounts argumen
 # Loading the library
 library(rFTX)
 
-# API key and secret
+# Example API key and secret
 key <- "LR0RQT6bKjrUNh38eCw9jYC89VDAbRkCogAc_XAm"
 secret <- "T4lPid48QtjNxjLUFOcUZghD7CUJ7sTVsfuvQZF2"
 
@@ -111,7 +111,7 @@ obj <- ftx_future_funding_rates(key, secret, markets=c(), start_time, end_time)
 
 ### Open Orders
 
-This function returns information on the account or subaccount open orders along with their statuses such as new (accepted but not processed yet), open, or closed (filled or cancelled).
+This function returns information on the account or subaccount if specified open orders along with their statuses such as new (accepted but not processed yet), open, or closed (filled or cancelled).
 
 ```{r, message=FALSE, eval=FALSE}
 obj <- ftx_open_orders(key, secret, subaccount, markets=c())
@@ -120,7 +120,7 @@ obj <- ftx_open_orders(key, secret, subaccount, markets=c())
 
 ### Orders History
 
-This function returns 
+This function returns the history of orders for the account or subaccount if specified.
 
 ```{r, message=FALSE, eval=FALSE}
 obj <- ftx_orders_history(key, secret, subaccount, markets=c())
@@ -129,17 +129,28 @@ obj <- ftx_orders_history(key, secret, subaccount, markets=c())
 
 ### Place Order
 
+This function places an order based on the information provided. Market, side, price, type and size are required arguments. It returns information on the order along with their statuses such as new (accepted but not processed yet), open, or closed (filled or cancelled).
+
 ```{r, message=FALSE, eval=FALSE}
+obj <- ftx_place_order(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, 
+                       reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
+
 ```
 
 ### Modify Order
 
+This function modifies an order based on size and price. Either price or size must be specified. The order's queue priority will be reset, and the order ID of the modified order will be different from that of the original order. Also, this is implemented as cancelling and replacing your order. There's a chance that the order meant to be cancelled gets filled and its replacement still gets placed.
+
 ```{r, message=FALSE, eval=FALSE}
+obj <- ftx_modify_order(key, secret, subaccount, order_id, size, price)
+
 ```
 
 #### Modify order by clientID
 
 ```{r, message=FALSE, eval=FALSE}
+obj <- ftx_modify_order_clientid(key, secret, subaccount, client_id, size, price)
+
 ```
 
 ### Order Status
