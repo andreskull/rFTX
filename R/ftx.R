@@ -211,7 +211,7 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: if success is FALSE, NA otherwise, 
 #' data: a tibble with the following fields: price, size and name
-#' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 10)
+#' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
 
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
@@ -239,13 +239,17 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 }
 
 #' @title FTX Trades
+#' @description Returns the trades that have taken place for a particular market
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: if success is FALSE, NA otherwise, 
+#' data: a tibble with the following fields: id, liquidation, price, side, size, time
+#' @examples ftx_trades(key, secret, market = "1INCH/USD")
 
 ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /markets/{market}/trades
