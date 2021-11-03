@@ -611,7 +611,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param price Price of order 
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
-ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, price, ...) {
+ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, ...) {
   # POST /orders/by_client_id/{client_order_id}/modify
   path = paste0('/api/orders/by_client_id/', client_id, '/modify')
   body <- list()
@@ -624,6 +624,10 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
     if(is.numeric(price) | is.null(price)){
       body$price = price
     }
+  }
+  
+  if(!missing(client_id)){
+    body$clientId = new_client_id
   }
   
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
