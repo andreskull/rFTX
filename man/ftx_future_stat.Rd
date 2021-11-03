@@ -12,6 +12,8 @@ ftx_future_stat(key, secret, market, tz = "GMT", ...)
 \item{secret}{A client's secret}
 
 \item{market}{Name of market}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

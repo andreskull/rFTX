@@ -45,6 +45,8 @@ ftx_place_order(
 \item{postOnly}{optional; default is false}
 
 \item{clientId}{optional; client order id}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

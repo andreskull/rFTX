@@ -27,6 +27,8 @@ ftx_modify_order(
 \item{size}{Size of order}
 
 \item{price}{Price of order}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

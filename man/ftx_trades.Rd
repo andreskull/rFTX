@@ -25,7 +25,7 @@ ftx_trades(
 
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 
-\item{tz}{Timezone to display. Default is GMT.}
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

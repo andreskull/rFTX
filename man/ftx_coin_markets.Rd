@@ -4,12 +4,14 @@
 \alias{ftx_coin_markets}
 \title{FTX Coin Markets}
 \usage{
-ftx_coin_markets(key, secret, ...)
+ftx_coin_markets(key, secret, tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

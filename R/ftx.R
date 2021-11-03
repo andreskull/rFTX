@@ -141,11 +141,18 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 }
 
 #' @title FTX Positions
+#' @description Returns the account positions
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param tz Timezone to display times in. Default is GMT.
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: if success is FALSE, NA otherwise, 
+#' data: a tibble with the following fields: cost, cumulativeBuySize, cumulativeSellSize, 
+#' entryPrice, estimatedLiquidationPrice, future, initialMarginRequirement, longOrderSize,
+#' maintenanceMarginRequirement, netSize, openSize, realizedPnl, recentAverageOpenPrice, 
+#' recentBreakEvenPrice, recentPnl, shortOrderSize, side, size, unrealizedPnl, collateralUsed
+#' @examples ftx_positions(key, secret, subaccount=NA)
 
 ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
   # GET /positions

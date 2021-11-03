@@ -24,6 +24,8 @@ ftx_future_funding_rates(
 \item{start_time}{POSIXct value from when to extract trades.}
 
 \item{end_time}{POSIXct value up-to when to extract trades.}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble

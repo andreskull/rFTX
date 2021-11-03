@@ -14,6 +14,8 @@ ftx_open_orders(key, secret, subaccount, markets = c(), tz = "GMT", ...)
 \item{subaccount}{A client's subaccount}
 
 \item{markets}{Vector of names of markets.}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: success: false/true, failure_reason: if available, data: tibble
