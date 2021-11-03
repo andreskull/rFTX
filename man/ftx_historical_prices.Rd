@@ -11,6 +11,7 @@ ftx_historical_prices(
   resolution = 14400,
   start_time = NA,
   end_time = NA,
+  tz = "GMT",
   ...
 )
 }

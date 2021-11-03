@@ -4,7 +4,7 @@
 \alias{ftx_open_orders}
 \title{FTX Open Orders}
 \usage{
-ftx_open_orders(key, secret, subaccount, markets = c(), ...)
+ftx_open_orders(key, secret, subaccount, markets = c(), tz = "GMT", ...)
 }
 \arguments{
 \item{key}{A client's key}
