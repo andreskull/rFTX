@@ -60,7 +60,7 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
 }
 
 #' @title Result Formatter
-#' @param result The result of an API request
+#' @param result The result of an API response
 #' @param time_label time column to be formatted to POSIXct
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A formatted tibble
@@ -76,6 +76,21 @@ result_formatter <- function(result, time_label, tz){
   }
   ))
   
+  return(df)
+}
+
+#' @title Helper Function for the Formatter
+#' @param list A list or section of list from API response
+#' @param time_label time column to be formatted to POSIXct
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A formatted tibble
+
+format_helper <- function(list, time_label, tz){
+  df <- list %>%
+    replace(lengths(.) == 0, NA) %>% 
+    tibble::as_tibble() %>%
+    mutate("{time_label}" := if(time_label %in% names(.))
+      as.POSIXct(gsub("(.*):", "\\1", get(time_label)), format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz) else NULL)
   return(df)
 }
 
@@ -315,11 +330,7 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
   df <- result_formatter(result, "expiry", tz)
   
   if(!is.na(market) & length(market) == 1){
-    df <- result %>%
-      replace(lengths(.) == 0, NA) %>% 
-      tibble::as_tibble() %>%
-      mutate(expiry = as.POSIXct(gsub("(.*):", "\\1", expiry), 
-                                          format = "%Y-%m-%dT%H:%M:%OS%z", tz = tz))
+    df <- format_helper(result, "expiry", tz)
   }
   return_obj <- list(
     success = response$success,
