@@ -62,6 +62,7 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
 #' @title Result Formatter
 #' @param result The result of an API request
 #' @param time_label time column to be formatted to POSIXct
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A formatted tibble
 
 result_formatter <- function(result, time_label, tz){
@@ -212,7 +213,7 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 #' @param market Name of market
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
-#' @param tz Timezone to display. Default is GMT.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -256,6 +257,7 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -304,6 +306,7 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
@@ -335,6 +338,7 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
@@ -363,6 +367,7 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
 #' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
@@ -407,6 +412,7 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
@@ -435,6 +441,7 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param markets Vector of names of markets. 
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
@@ -471,6 +478,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @param ioc optional; default is false
 #' @param postOnly optional; default is false
 #' @param clientId optional; client order id
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA, tz = "GMT", ...) {
@@ -525,6 +533,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 #' @param order_id Numeric value of order ID
 #' @param size Size of order
 #' @param price Price of order 
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz = "GMT", ...) {
@@ -564,6 +573,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...) {
@@ -619,6 +629,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param client_id Numeric value of client order ID
 #' @param size Size of order
 #' @param price Price of order 
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, price, tz = "GMT", ...) {
@@ -658,6 +669,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, size, 
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Numeric value of client order ID
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "GMT", ...) {
@@ -713,6 +725,7 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 #' @param markets Vector of names of markets. 
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
@@ -757,6 +770,7 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 #' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -793,6 +807,7 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 #' @param secret A client's secret
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz = "GMT", ...) {
@@ -829,6 +844,7 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
@@ -852,6 +868,7 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ..
 #' @param subaccount A client's subaccount
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
 
 ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, tz = "GMT", ...) {
