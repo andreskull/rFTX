@@ -100,10 +100,14 @@ format_helper <- function(list, time_label, tz){
 # Test with the real failure cases against FTX and decide case-by-case
 
 #' @title FTX Coin Balances
+#' @description Returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts.
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param accounts Optional parameter. A vector of client sub-accounts
-#' @return A list of three elements: success: false/true, failure_reason: if available, data: tibble
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: if success is FALSE, NA otherwise, 
+#' data: a tibble with the following fields: coin, free, spotBorrow, total, usdValue, availableWithoutBorrow
+#' @examples ftx_coin_balances(key, secret, accounts = c())
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
