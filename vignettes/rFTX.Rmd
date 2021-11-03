@@ -58,7 +58,7 @@ To test the connection with the coin balances function, the below code is used. 
 library(rFTX, quietly = T)
 
 # example use
-obj <- ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
+ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 
 ```
 
