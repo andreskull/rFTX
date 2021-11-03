@@ -2,10 +2,7 @@
 #'
 
 library(tidyverse)
-library(digest)
 library(lubridate)
-library(stringi)
-library(assert)
 library(logging)
 library(httr)
 
