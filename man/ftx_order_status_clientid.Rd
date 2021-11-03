@@ -14,10 +14,17 @@ ftx_order_status_clientid(key, secret, subaccount, client_id, tz = "GMT", ...)
 \item{subaccount}{A client's subaccount}
 
 \item{client_id}{Numeric value of client order ID}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
-A list of three elements: success: false/true, failure_reason: if available, data: tibble
+A list of three elements: a logical vector success: FALSE/TRUE,
+failure_reason: reason for failure if success is FALSE, NA otherwise,
+data: a tibble containing the data if success is TRUE
 }
 \description{
-FTX Order Status by Client ID
+Returns the status of orders using the client ID instead of the order ID
+}
+\examples{
+ftx_order_status_clientid(key, secret, subaccount, client_id)
 }
