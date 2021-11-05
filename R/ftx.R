@@ -524,6 +524,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
   path = paste0('/api/orders/history')
 
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
   df <- result_formatter(result, "createdAt", tz)
