@@ -212,7 +212,10 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
   if(depth > 100) loginfo(msg = 'Depth value is too large. Using max value = 100.')
-  if(depth < 1) logerror(msg = 'Depth value is too small. Min value is 1.')
+  if(depth < 1){ 
+    logerror(msg = 'Depth value is too small. Min value is 1.')
+    return(list(success = F, failure_reason = 'Depth value is too small. Min value is 1.', data = NULL))
+  }
   
   path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
