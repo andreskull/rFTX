@@ -1,12 +1,24 @@
-#' @exportPattern (("^ftx_.*$")|("^[ftx_send_request]"))
-#'
-
 library(tidyverse)
 library(lubridate)
 library(logging)
 library(httr)
 
 base_url <- "https://ftx.com"
+
+#' @title FTX Send Request
+#' @description A helper function
+#' @param method REST API Method such as GET or POST
+#' @param path An additional path defined for each function
+#' @param key A client's key
+#' @param secret A client's secret
+#' @param subaccount A client's subaccount
+#' @param body Only for POST method. A named list of values containing market name (string), 
+#' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
+#' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
+#' @return A response object as a list containing two elements, a logical vector success of 1 length and 
+#' either an error element if success is FALSE or result list if success is TRUE.,
+#' @examples ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
+#' @noRd 
 
 ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   url <- paste0(base_url, path)
@@ -45,6 +57,14 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
   response
 }
 
+#' @title Result Formatter
+#' @description A helper function
+#' @param result The result of an API response
+#' @param time_label time column to be formatted to POSIXct
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A formatted tibble
+#' @noRd 
+
 result_formatter <- function(result, time_label, tz){
   
   df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
@@ -54,6 +74,14 @@ result_formatter <- function(result, time_label, tz){
   
   return(df)
 }
+
+#' @title Helper Function for the Formatter
+#' @description A helper function
+#' @param list A list or section of list from API response
+#' @param time_label time column to be formatted to POSIXct
+#' @param tz Timezone to display times in. Default is GMT.
+#' @return A formatted tibble
+#' @noRd
 
 format_helper <- function(list, time_label, tz){
   df <- list %>%
@@ -77,6 +105,7 @@ format_helper <- function(list, time_label, tz){
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_coin_balances(key, secret, accounts = c())
+#' @export
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
@@ -119,6 +148,7 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_positions(key, secret, subaccount=NA)
+#' @export
 
 ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
   # GET /positions
@@ -149,6 +179,7 @@ ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_coin_markets(key, secret)
+#' @export
 
 ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
   # GET /markets
@@ -175,6 +206,7 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
+#' @export
 
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
@@ -213,6 +245,7 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_trades(key, secret, market = "1INCH/USD")
+#' @export
 
 ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /markets/{market}/trades
@@ -261,6 +294,7 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_historical_prices(key, secret, market = "1INCH/USD")
+#' @export
 
 ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
@@ -317,6 +351,7 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_future_markets(key, secret)
+#' @export
 
 ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
   # GET /futures (if market == NA)
@@ -351,6 +386,7 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_future_stat(key, secret, market = "CRV-PERP") 
+#' @export
 
 ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
   # GET /futures/{market}/stats
@@ -381,6 +417,7 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_future_funding_rates(key, secret, markets=c('CRV-PERP','XRP-PERP'))
+#' @export
 
 ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /funding_rates
@@ -430,6 +467,7 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_open_orders(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+#' @export
 
 ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
   # GET /orders?market={market}
@@ -463,6 +501,7 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_orders_history(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+#' @export
 
 ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
   # GET /orders/history?market={market}
@@ -505,6 +544,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3, 
 #' reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
+#' @export
 
 ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT", ...) {
 
@@ -561,6 +601,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_modify_order(key, secret, subaccount, order_id, size, price)
+#' @export
 
 ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz = "GMT", ...) {
   # POST /orders/{order_id}/modify
@@ -601,6 +642,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_order_status(key, secret, subaccount, order_id)
+#' @export
 
 ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...) {
   # GET /orders/by_client_id/{client_order_id}
@@ -635,6 +677,7 @@ ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...)
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' result: if success is TRUE: "Order queued for cancellation"
 #' @examples ftx_cancel_order(key, secret, subaccount, order_id)
+#' @export
 
 ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
   # DELETE /orders/{order_id}
@@ -654,8 +697,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-
-#' @param client_id Numeric value of client order ID
+#' @param client_id Character string of client order ID
 #' @param new_client_id Character string of new client order ID
 #' @param size Size of order
 #' @param price Price of order 
@@ -664,6 +706,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_modify_order_clientid(key, secret, subaccount, client_id, new_client_id, size, price)
+#' @export
 
 ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, tz = "GMT", ...) {
 
@@ -709,6 +752,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_cl
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_order_status_clientid(key, secret, subaccount, client_id)
+#' @export
 
 ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "GMT", ...) {
   # GET /orders/by_client_id/{client_order_id}
@@ -743,6 +787,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' result: if success is TRUE: "Order queued for cancellation"
 #' @examples ftx_cancel_order_clientid(key, secret, subaccount, client_id)
+#' @export
 
 ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
   # DELETE /orders/by_client_id/{client_order_id}
@@ -770,6 +815,7 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_order_fills(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+#' @export
 
 ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /fills?market={market} 
@@ -819,6 +865,7 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_funding_payments(key, secret, subaccount)
+#' @export
 
 ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, tz = "GMT", ...) {
   # GET /funding_payments
@@ -860,6 +907,7 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_spot_lending_history(key, secret)
+#' @export
 
 ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /spot_margin/history
@@ -901,6 +949,7 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_spot_margin_borrow_rates(key, secret, subaccount)
+#' @export
 
 ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
   # GET /spot_margin/borrow_rates
@@ -929,6 +978,7 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ..
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_my_spot_borrow_history(key, secret, subaccount)
+#' @export
 
 ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, tz = "GMT", ...) {
   # GET /spot_margin/borrow_history

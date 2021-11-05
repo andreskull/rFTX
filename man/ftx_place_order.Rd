@@ -16,7 +16,7 @@ ftx_place_order(
   reduceOnly = FALSE,
   ioc = FALSE,
   postOnly = FALSE,
-  clientId = NA,
+  client_id = NA,
   tz = "GMT",
   ...
 )
@@ -44,7 +44,7 @@ ftx_place_order(
 
 \item{postOnly}{optional; default is false}
 
-\item{clientId}{optional; client order id}
+\item{client_id}{optional; client order id}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
