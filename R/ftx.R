@@ -307,6 +307,7 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   if(resolution == 0 | !(resolution%%86400) %in% res_values | resolution > (30*86400)) {
     logerror(msg = 'Unsupported candle resolution value. Supported values are 15, 60, 300, 900, 
              3600, 14400, 86400, or any multiple of 86400 up to 30*86400')
+    return(list(success = F, failure_reason = 'Unsupported candle resolution value. Supported values are 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400', data = NULL))
   }
   
   # check start and end times
