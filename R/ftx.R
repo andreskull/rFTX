@@ -111,6 +111,7 @@ format_helper <- function(list, time_label, tz){
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
   response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   # add response$success == FALSE handling
   result = response$result
@@ -156,6 +157,7 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
   # GET /positions
   response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
   if(length(result) > 0){
@@ -188,6 +190,7 @@ ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
 ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
   # GET /markets
   response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -224,6 +227,8 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   
   path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
@@ -278,6 +283,8 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
   
   response = ftx_send_request(method = "GET", path = path, key, secret, 
                               query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -337,6 +344,8 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
   
   response = ftx_send_request(method = "GET", path = path, key, secret,
                               query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "startTime", tz)
@@ -373,6 +382,8 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
     path = paste0(path, '/', market)
   }
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "expiry", tz)
@@ -406,6 +417,8 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
 
   path = paste0('/api/futures/', market, '/stats')
   response = ftx_send_request(method = "GET", path = path, key, secret, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- format_helper(result, "nextFundingTime", tz)
@@ -454,6 +467,8 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
   
   response = ftx_send_request(method = "GET", path = path, key, secret,
                               query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -489,6 +504,8 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
   path = paste0('/api/orders')
   
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "createdAt", tz)
@@ -524,6 +541,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
   path = paste0('/api/orders/history')
 
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
   df <- result_formatter(result, "createdAt", tz)
@@ -593,6 +611,8 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   if(postOnly %in% c(T,F)) body$postOnly = postOnly
   body$clientId = client_id
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- format_helper(result, "createdAt", tz)
@@ -637,6 +657,8 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
   }
   
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- format_helper(result, "createdAt", tz)
@@ -667,6 +689,8 @@ ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...)
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/', order_id)
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   n_results <- length(result$id)
@@ -703,6 +727,8 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
   # DELETE /orders/{order_id}
   path = paste0('/api/orders/', order_id)
   response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   return_obj <- list(
     success = response$success,
@@ -750,6 +776,8 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_cl
   }
   
   response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- format_helper(result, "createdAt", tz)
@@ -780,6 +808,8 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/by_client_id/', client_id)
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   n_results <- length(result$id)
@@ -816,6 +846,8 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
   # DELETE /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/by_client_id/', client_id)
   response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   return_obj <- list(
     success = response$success,
@@ -861,6 +893,8 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
   
   response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, 
                               query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -909,6 +943,8 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
   }
   response = ftx_send_request(method = "GET", path = '/api/funding_payments', key, secret, 
                               subaccount, query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -953,6 +989,8 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
   
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/history', key, secret, 
                               query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -981,6 +1019,8 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
 ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
   # GET /spot_margin/borrow_rates
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_rates', key, secret, subaccount, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
@@ -1025,6 +1065,8 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, e
   }
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, 
                               subaccount, query = query_list, ...)
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  
   result = response$result
   
   df <- result_formatter(result, "time", tz)
