@@ -575,7 +575,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3)
+#' @examples ftx_place_order(key,secret,subaccount,market="XRP-PERP",side="buy",price=1,type="limit",size=3)
 #' @export
 
 ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT", ...) {
