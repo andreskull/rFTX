@@ -68,10 +68,8 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
 
 result_formatter <- function(result, time_label, tz){
   
-  df <- do.call(plyr::rbind.fill, apply(tibble(r = result), 1, function(x) {
-    df <- format_helper(x[[1]], time_label, tz)
-  }
-  ))
+  df <- bind_rows(result)
+  df <- format_helper(df, time_label, tz)
   
   return(df)
 }
@@ -84,8 +82,8 @@ result_formatter <- function(result, time_label, tz){
 #' @return A formatted tibble
 #' @noRd
 
-format_helper <- function(list, time_label, tz){
-  df <- list %>%
+format_helper <- function(obj, time_label, tz){
+  df <- obj %>%
     replace(lengths(.) == 0, NA) %>% 
     tibble::as_tibble() %>%
     mutate("{time_label}" := if(time_label %in% names(.))
