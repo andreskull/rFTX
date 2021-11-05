@@ -13,7 +13,6 @@ ftx_cancel_order_clientid(key, secret, subaccount, client_id, ...)
 
 \item{subaccount}{A client's subaccount}
 
-
 \item{client_id}{Character string of client order ID}
 }
 \value{

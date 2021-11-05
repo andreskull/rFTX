@@ -4,18 +4,17 @@
 \alias{ftx_modify_order_clientid}
 \title{FTX Modify Order by Client ID}
 \usage{
-
 ftx_modify_order_clientid(
   key,
   secret,
   subaccount,
   client_id,
+  new_client_id,
   size,
   price,
   tz = "GMT",
   ...
 )
-
 }
 \arguments{
 \item{key}{A client's key}
@@ -26,11 +25,11 @@ ftx_modify_order_clientid(
 
 \item{client_id}{Character string of client order ID}
 
+\item{new_client_id}{Character string of new client order ID}
 
 \item{size}{Size of order}
 
 \item{price}{Price of order}
-
 
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
@@ -44,5 +43,4 @@ Modifies an order using the client ID instead of the order ID
 }
 \examples{
 ftx_modify_order_clientid(key, secret, subaccount, client_id, new_client_id, size, price)
-
 }

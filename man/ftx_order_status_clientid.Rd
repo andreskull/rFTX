@@ -4,9 +4,7 @@
 \alias{ftx_order_status_clientid}
 \title{FTX Order Status by Client ID}
 \usage{
-
 ftx_order_status_clientid(key, secret, subaccount, client_id, tz = "GMT", ...)
-
 }
 \arguments{
 \item{key}{A client's key}
@@ -14,7 +12,6 @@ ftx_order_status_clientid(key, secret, subaccount, client_id, tz = "GMT", ...)
 \item{secret}{A client's secret}
 
 \item{subaccount}{A client's subaccount}
-
 
 \item{client_id}{Character string of client order ID}
 
@@ -30,5 +27,4 @@ Returns the status of orders using the client ID instead of the order ID
 }
 \examples{
 ftx_order_status_clientid(key, secret, subaccount, client_id)
-
 }
