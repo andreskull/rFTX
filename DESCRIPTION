@@ -17,8 +17,7 @@ Imports:
     vctrs (>= 0.3.8),
     digest (>= 0.6.28),
     jsonlite (>= 1.7.2)
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
