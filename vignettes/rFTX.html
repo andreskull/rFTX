@@ -12,7 +12,7 @@
 
 <meta name="author" content="Andres Kull" />
 
-<meta name="date" content="2021-11-03" />
+<meta name="date" content="2021-11-05" />
 
 <title>rFTX</title>
 
@@ -141,7 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">rFTX</h1>
 <h4 class="author">Andres Kull</h4>
-<h4 class="date">2021-11-03</h4>
+<h4 class="date">2021-11-05</h4>
 
 
 
@@ -181,7 +181,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rFTX, <span class="at">quietly =</span> T)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># example use</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">ftx_send_request</span>(<span class="at">method =</span> <span class="st">&quot;GET&quot;</span>, <span class="at">path =</span> <span class="st">&quot;/api/funding_rates&quot;</span>, <span class="at">key =</span> <span class="st">&quot;&quot;</span>, <span class="at">secret =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ftx_trades</span>(<span class="at">key =</span> <span class="st">&quot;&quot;</span>, <span class="at">secret =</span> <span class="st">&quot;&quot;</span>, <span class="at">market =</span> <span class="st">&quot;AAPL/USD&quot;</span>)</span></code></pre></div>
+<pre><code>## $success
+## [1] TRUE
+## 
+## $failure_reason
+## [1] NA
+## 
+## $data
+##            id  price   size side liquidation                time
+## 1  2346394403 150.75   0.10 sell       FALSE 2021-11-05 00:34:58
+## 2  2346394325 151.21   0.10  buy       FALSE 2021-11-05 00:34:58
+## 3  2346268217 151.21   0.10  buy       FALSE 2021-11-05 00:19:58
+## 4  2346118252 151.22   0.10  buy       FALSE 2021-11-05 00:03:58
+## 5  2346013716 150.77   0.10 sell       FALSE 2021-11-04 23:51:58
+## 6  2345992134 151.17   0.10  buy       FALSE 2021-11-04 23:47:58
+## 7  2345897040 151.26   0.10  buy       FALSE 2021-11-04 23:31:58
+## 8  2345806054 150.76  85.93 sell       FALSE 2021-11-04 23:18:48
+## 9  2345806053 150.88 105.73 sell       FALSE 2021-11-04 23:18:48
+## 10 2345806052 151.07   0.09 sell       FALSE 2021-11-04 23:18:48
+## 11 2345754982 151.29   0.10  buy       FALSE 2021-11-04 23:11:58
+## 12 2345574467 151.07   0.11 sell       FALSE 2021-11-04 22:44:57
+## 13 2345567925 151.30   0.11  buy       FALSE 2021-11-04 22:43:58
+## 14 2345183057 151.53   0.10  buy       FALSE 2021-11-04 21:45:58
+## 15 2345056101 151.58   1.57  buy       FALSE 2021-11-04 21:20:42
+## 16 2345056100 151.52   0.06  buy       FALSE 2021-11-04 21:20:42
+## 17 2345056099 151.42   0.03  buy       FALSE 2021-11-04 21:20:42
+## 18 2345056098 151.38   0.20  buy       FALSE 2021-11-04 21:20:42
+## 19 2344905231 151.07   0.20  buy       FALSE 2021-11-04 20:55:01
+## 20 2344657203 150.50   0.01 sell       FALSE 2021-11-04 20:18:30</code></pre>
 <p>Further instructions on functions can be accessed via <code>vignette(&quot;rFTX-Functionality&quot;)</code>.</p>
 </div>
 

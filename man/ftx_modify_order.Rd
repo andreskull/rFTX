@@ -29,6 +29,8 @@ ftx_modify_order(
 \item{price}{Price of order}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

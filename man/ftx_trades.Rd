@@ -26,6 +26,8 @@ ftx_trades(
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

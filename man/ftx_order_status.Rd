@@ -16,6 +16,8 @@ ftx_order_status(key, secret, subaccount, order_id, tz = "GMT", ...)
 \item{order_id}{Numeric value of order ID}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

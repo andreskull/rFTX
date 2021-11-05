@@ -14,6 +14,8 @@ ftx_cancel_order(key, secret, subaccount, order_id, ...)
 \item{subaccount}{A client's subaccount}
 
 \item{order_id}{Numeric value of order ID}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

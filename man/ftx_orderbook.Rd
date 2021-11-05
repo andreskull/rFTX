@@ -14,6 +14,8 @@ ftx_orderbook(key, secret, market = NA, depth = 5, ...)
 \item{market}{Name of market}
 
 \item{depth}{Market depth. Min 1, Max 100, default 5}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
