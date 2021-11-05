@@ -59,6 +59,5 @@ data: a tibble containing the data if success is TRUE
 Places an order based on the information provided
 }
 \examples{
-ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3, 
-reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
+ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3)
 }
