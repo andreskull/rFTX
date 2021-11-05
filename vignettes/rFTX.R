@@ -21,6 +21,6 @@
 library(rFTX, quietly = T)
 
 # example use
-obj <- ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
+ftx_trades(key = "", secret = "", market = "AAPL/USD")
 
 

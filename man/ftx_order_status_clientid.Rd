@@ -16,6 +16,8 @@ ftx_order_status_clientid(key, secret, subaccount, client_id, tz = "GMT", ...)
 \item{client_id}{Character string of client order ID}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

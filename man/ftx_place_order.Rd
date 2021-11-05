@@ -47,6 +47,8 @@ ftx_place_order(
 \item{client_id}{optional; client order id}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

@@ -16,6 +16,8 @@ ftx_open_orders(key, secret, subaccount, markets = c(), tz = "GMT", ...)
 \item{markets}{Vector of names of markets.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
+
+\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
