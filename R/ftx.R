@@ -211,7 +211,7 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
-  if(depth > 100) logerror(msg = 'Depth value is too large. Max value is 100.')
+  if(depth > 100) loginfo(msg = 'Depth value is too large. Using max value = 100.')
   if(depth < 1) logerror(msg = 'Depth value is too small. Min value is 1.')
   
   path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
