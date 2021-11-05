@@ -38,5 +38,5 @@ data: a tibble containing the data if success is TRUE
 Returns the trades that have taken place for a particular market
 }
 \examples{
-ftx_trades(key, secret, market = "1INCH/USD")
+ftx_trades(key="", secret="", market = "1INCH/USD")
 }

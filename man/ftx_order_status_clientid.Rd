@@ -28,5 +28,5 @@ data: a tibble containing the data if success is TRUE
 Returns the status of orders using the client ID instead of the order ID
 }
 \examples{
-ftx_order_status_clientid(key, secret, subaccount, client_id)
+ftx_order_status_clientid(key="", secret="", subaccount=NA, client_id="order1")
 }

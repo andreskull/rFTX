@@ -26,5 +26,5 @@ result: if success is TRUE: "Order queued for cancellation"
 Queues an order for cancellation using the client ID instead of the order ID
 }
 \examples{
-ftx_cancel_order_clientid(key, secret, subaccount, client_id)
+ftx_cancel_order_clientid(key="", secret="", subaccount=NA, client_id="order1")
 }

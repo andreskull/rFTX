@@ -44,5 +44,6 @@ data: a tibble containing the data if success is TRUE
 Modifies an order using the client ID instead of the order ID
 }
 \examples{
-ftx_modify_order_clientid(key, secret, subaccount, client_id, new_client_id, size, price)
+ftx_modify_order_clientid(key="", secret="", subaccount=NA, client_id="order1", 
+new_client_id="order2", size=2, price=1)
 }

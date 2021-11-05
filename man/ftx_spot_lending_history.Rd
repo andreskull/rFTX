@@ -35,5 +35,5 @@ data: a tibble containing the data if success is TRUE
 Returns the lending history for coins
 }
 \examples{
-ftx_spot_lending_history(key, secret)
+ftx_spot_lending_history(key="", secret="")
 }

@@ -26,5 +26,5 @@ data: a tibble containing the data if success is TRUE
 Returns the estimated hourly borrow rate for the next spot margin cycle and the hourly borrow rate in the previous spot margin cycle for coins.
 }
 \examples{
-ftx_spot_margin_borrow_rates(key, secret, subaccount)
+ftx_spot_margin_borrow_rates(key="", secret="", subaccount=NA)
 }

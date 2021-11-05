@@ -24,5 +24,5 @@ data: a tibble containing the data if success is TRUE
 Returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts.
 }
 \examples{
-ftx_coin_balances(key, secret, accounts = c())
+ftx_coin_balances(key="", secret="", accounts = c())
 }

@@ -28,5 +28,5 @@ data: a tibble containing the data if success is TRUE
 Returns the history of orders for the account or subaccount if specified
 }
 \examples{
-ftx_orders_history(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+ftx_orders_history(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 }

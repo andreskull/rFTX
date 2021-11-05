@@ -38,5 +38,5 @@ data: a tibble containing the data if success is TRUE
 Returns the funding rates of futures
 }
 \examples{
-ftx_future_funding_rates(key, secret, markets=c('CRV-PERP','XRP-PERP'))
+ftx_future_funding_rates(key="", secret="", markets=c('CRV-PERP','XRP-PERP'))
 }

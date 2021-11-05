@@ -41,5 +41,5 @@ data: a tibble containing the data if success is TRUE
 Modifies an order's size and price
 }
 \examples{
-ftx_modify_order(key, secret, subaccount, order_id, size, price)
+ftx_modify_order(key="", secret="", subaccount=NA, order_id=1234, size=2, price=1)
 }

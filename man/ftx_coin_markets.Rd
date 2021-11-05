@@ -24,5 +24,5 @@ data: a tibble containing the data if success is TRUE
 Returns information on all types of markets on FTX
 }
 \examples{
-ftx_coin_markets(key, secret)
+ftx_coin_markets(key="", secret="")
 }

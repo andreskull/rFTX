@@ -41,5 +41,5 @@ data: a tibble containing the data if success is TRUE
 Returns market fills
 }
 \examples{
-ftx_order_fills(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+ftx_order_fills(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 }

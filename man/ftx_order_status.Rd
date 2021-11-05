@@ -28,5 +28,5 @@ data: a tibble containing the data if success is TRUE
 Returns the status of orders
 }
 \examples{
-ftx_order_status(key, secret, subaccount, order_id)
+ftx_order_status(key="", secret="", subaccount=NA, order_id=1234)
 }
