@@ -27,8 +27,7 @@ rFTX package is not yet on CRAN but it will soon be.
 You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("andreskull/rFTX")
+devtools::install_github("andreskull/rFTX", build_vignettes = TRUE)
 ```
 ## GET Example
 

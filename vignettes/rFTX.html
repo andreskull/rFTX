@@ -152,7 +152,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2>Setting up</h2>
 <p>To use this package, you’ll need to install it from GitHub or CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from GitHub</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;rFTX&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;andreskull/rFTX&quot;</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># from CRAN</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;rFTX&quot;</span>)</span></code></pre></div>
@@ -189,27 +189,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## [1] NA
 ## 
 ## $data
-##            id  price   size side liquidation                time
-## 1  2346394403 150.75   0.10 sell       FALSE 2021-11-05 00:34:58
-## 2  2346394325 151.21   0.10  buy       FALSE 2021-11-05 00:34:58
-## 3  2346268217 151.21   0.10  buy       FALSE 2021-11-05 00:19:58
-## 4  2346118252 151.22   0.10  buy       FALSE 2021-11-05 00:03:58
-## 5  2346013716 150.77   0.10 sell       FALSE 2021-11-04 23:51:58
-## 6  2345992134 151.17   0.10  buy       FALSE 2021-11-04 23:47:58
-## 7  2345897040 151.26   0.10  buy       FALSE 2021-11-04 23:31:58
-## 8  2345806054 150.76  85.93 sell       FALSE 2021-11-04 23:18:48
-## 9  2345806053 150.88 105.73 sell       FALSE 2021-11-04 23:18:48
-## 10 2345806052 151.07   0.09 sell       FALSE 2021-11-04 23:18:48
-## 11 2345754982 151.29   0.10  buy       FALSE 2021-11-04 23:11:58
-## 12 2345574467 151.07   0.11 sell       FALSE 2021-11-04 22:44:57
-## 13 2345567925 151.30   0.11  buy       FALSE 2021-11-04 22:43:58
-## 14 2345183057 151.53   0.10  buy       FALSE 2021-11-04 21:45:58
-## 15 2345056101 151.58   1.57  buy       FALSE 2021-11-04 21:20:42
-## 16 2345056100 151.52   0.06  buy       FALSE 2021-11-04 21:20:42
-## 17 2345056099 151.42   0.03  buy       FALSE 2021-11-04 21:20:42
-## 18 2345056098 151.38   0.20  buy       FALSE 2021-11-04 21:20:42
-## 19 2344905231 151.07   0.20  buy       FALSE 2021-11-04 20:55:01
-## 20 2344657203 150.50   0.01 sell       FALSE 2021-11-04 20:18:30</code></pre>
+## # A tibble: 20 x 6
+##            id price  size side  liquidation time               
+##         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;lgl&gt;       &lt;dttm&gt;             
+##  1 2350539301  151.  0.11 sell  FALSE       2021-11-05 10:57:57
+##  2 2350534009  151.  0.1  buy   FALSE       2021-11-05 10:57:00
+##  3 2350422868  151.  0.08 buy   FALSE       2021-11-05 10:42:27
+##  4 2350232444  151.  0.1  buy   FALSE       2021-11-05 10:13:58
+##  5 2349965590  151.  0.01 buy   FALSE       2021-11-05 09:42:55
+##  6 2349963332  151.  0.01 buy   FALSE       2021-11-05 09:42:44
+##  7 2349761605  151.  0.03 buy   FALSE       2021-11-05 09:17:40
+##  8 2349627559  151.  0.07 sell  FALSE       2021-11-05 08:54:51
+##  9 2349396190  151.  0.2  sell  FALSE       2021-11-05 08:13:43
+## 10 2349331600  151.  2.5  buy   FALSE       2021-11-05 08:03:47
+## 11 2349331599  151.  0.16 buy   FALSE       2021-11-05 08:03:47
+## 12 2349105164  151.  0.03 sell  FALSE       2021-11-05 07:30:00
+## 13 2348864001  151.  0.01 buy   FALSE       2021-11-05 06:48:15
+## 14 2348860717  151.  0.06 buy   FALSE       2021-11-05 06:47:38
+## 15 2348319105  151.  0.04 buy   FALSE       2021-11-05 05:20:40
+## 16 2347312412  151.  0.1  sell  FALSE       2021-11-05 02:39:59
+## 17 2347312349  151.  0.1  buy   FALSE       2021-11-05 02:39:58
+## 18 2347212192  151.  0.23 buy   FALSE       2021-11-05 02:25:13
+## 19 2347034664  151.  0.16 sell  FALSE       2021-11-05 01:58:58
+## 20 2347034610  151.  0.12 buy   FALSE       2021-11-05 01:58:58</code></pre>
 <p>Further instructions on functions can be accessed via <code>vignette(&quot;rFTX-Functionality&quot;)</code>.</p>
 </div>
 

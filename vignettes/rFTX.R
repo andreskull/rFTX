@@ -1,6 +1,6 @@
 ## ---- eval = FALSE------------------------------------------------------------
 #  # from GitHub
-#  devtools::install_github("rFTX")
+#  devtools::install_github("andreskull/rFTX", build_vignettes = TRUE)
 #  
 #  # from CRAN
 #  install.packages("rFTX")
