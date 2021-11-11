@@ -18,7 +18,6 @@ base_url <- "https://ftx.com"
 #' @param ... Additional parameters to pass to API request
 #' @return A response object as a list containing two elements, a logical vector success of 1 length and 
 #' either an error element if success is FALSE or result list if success is TRUE.,
-#' @examples ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 #' @noRd 
 
 ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
