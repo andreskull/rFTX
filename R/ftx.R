@@ -7,7 +7,7 @@
 #' @importFrom purrr set_names map_df
 #' @importFrom rlang := 
 
-utils::globalVariables(c("."))
+utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size"))
 
 base_url <- "https://ftx.com"
 
