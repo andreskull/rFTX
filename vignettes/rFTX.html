@@ -12,7 +12,7 @@
 
 <meta name="author" content="Andres Kull" />
 
-<meta name="date" content="2021-11-05" />
+<meta name="date" content="2021-11-11" />
 
 <title>rFTX</title>
 
@@ -141,7 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">rFTX</h1>
 <h4 class="author">Andres Kull</h4>
-<h4 class="date">2021-11-05</h4>
+<h4 class="date">2021-11-11</h4>
 
 
 
@@ -169,10 +169,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(tidyverse)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(digest)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(lubridate)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(stringi)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(assert)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(logging)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(httr)</span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(logging)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(httr)</span></code></pre></div>
 </div>
 <div id="connecting-to-ftx-api" class="section level2">
 <h2>Connecting to FTX API</h2>
@@ -192,26 +190,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## # A tibble: 20 x 6
 ##            id price  size side  liquidation time               
 ##         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;lgl&gt;       &lt;dttm&gt;             
-##  1 2350539301  151.  0.11 sell  FALSE       2021-11-05 10:57:57
-##  2 2350534009  151.  0.1  buy   FALSE       2021-11-05 10:57:00
-##  3 2350422868  151.  0.08 buy   FALSE       2021-11-05 10:42:27
-##  4 2350232444  151.  0.1  buy   FALSE       2021-11-05 10:13:58
-##  5 2349965590  151.  0.01 buy   FALSE       2021-11-05 09:42:55
-##  6 2349963332  151.  0.01 buy   FALSE       2021-11-05 09:42:44
-##  7 2349761605  151.  0.03 buy   FALSE       2021-11-05 09:17:40
-##  8 2349627559  151.  0.07 sell  FALSE       2021-11-05 08:54:51
-##  9 2349396190  151.  0.2  sell  FALSE       2021-11-05 08:13:43
-## 10 2349331600  151.  2.5  buy   FALSE       2021-11-05 08:03:47
-## 11 2349331599  151.  0.16 buy   FALSE       2021-11-05 08:03:47
-## 12 2349105164  151.  0.03 sell  FALSE       2021-11-05 07:30:00
-## 13 2348864001  151.  0.01 buy   FALSE       2021-11-05 06:48:15
-## 14 2348860717  151.  0.06 buy   FALSE       2021-11-05 06:47:38
-## 15 2348319105  151.  0.04 buy   FALSE       2021-11-05 05:20:40
-## 16 2347312412  151.  0.1  sell  FALSE       2021-11-05 02:39:59
-## 17 2347312349  151.  0.1  buy   FALSE       2021-11-05 02:39:58
-## 18 2347212192  151.  0.23 buy   FALSE       2021-11-05 02:25:13
-## 19 2347034664  151.  0.16 sell  FALSE       2021-11-05 01:58:58
-## 20 2347034610  151.  0.12 buy   FALSE       2021-11-05 01:58:58</code></pre>
+##  1 2419764816  149.  6.3  buy   FALSE       2021-11-11 15:35:00
+##  2 2419764815  149.  1    buy   FALSE       2021-11-11 15:35:00
+##  3 2419744738  148.  7.47 sell  FALSE       2021-11-11 15:33:02
+##  4 2419734630  149.  7.44 buy   FALSE       2021-11-11 15:31:58
+##  5 2419715690  148.  7.3  sell  FALSE       2021-11-11 15:29:51
+##  6 2419696975  149.  7.3  buy   FALSE       2021-11-11 15:27:26
+##  7 2419688859  149.  7.3  sell  FALSE       2021-11-11 15:26:02
+##  8 2419667932  148.  8    sell  FALSE       2021-11-11 15:24:16
+##  9 2419666418  149.  7.3  buy   FALSE       2021-11-11 15:23:57
+## 10 2419656305  148.  7.3  sell  FALSE       2021-11-11 15:22:02
+## 11 2419635262  149.  7.3  buy   FALSE       2021-11-11 15:19:45
+## 12 2419618785  148.  7.3  sell  FALSE       2021-11-11 15:17:30
+## 13 2419598760  149.  5.3  buy   FALSE       2021-11-11 15:15:05
+## 14 2419598759  149.  1    buy   FALSE       2021-11-11 15:15:05
+## 15 2419585559  148.  3.99 sell  FALSE       2021-11-11 15:13:47
+## 16 2419585178  148.  1    buy   FALSE       2021-11-11 15:13:45
+## 17 2419565106  148.  7.29 sell  FALSE       2021-11-11 15:11:46
+## 18 2419565105  148.  0.01 sell  FALSE       2021-11-11 15:11:46
+## 19 2419557137  148.  0.23 sell  FALSE       2021-11-11 15:10:57
+## 20 2419552414  149.  7.33 buy   FALSE       2021-11-11 15:10:21</code></pre>
 <p>Further instructions on functions can be accessed via <code>vignette(&quot;rFTX-Functionality&quot;)</code>.</p>
 </div>
 

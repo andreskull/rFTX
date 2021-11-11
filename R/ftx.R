@@ -1,7 +1,10 @@
-library(tidyverse)
-library(lubridate)
-library(logging)
-library(httr)
+#' @importFrom magrittr %>%
+#' @importFrom lubridate now
+#' @importFrom httr GET POST DELETE add_headers content
+#' @importFrom dplyr bind_rows mutate filter select
+#' @importFrom logging logerror loginfo
+#' @importFrom tibble tibble as_tibble add_column
+#' @importFrom purrr set_names map_df
 
 base_url <- "https://ftx.com"
 

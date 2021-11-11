@@ -10,8 +10,6 @@
 #  install.packages(tidyverse)
 #  install.packages(digest)
 #  install.packages(lubridate)
-#  install.packages(stringi)
-#  install.packages(assert)
 #  install.packages(logging)
 #  install.packages(httr)
 #  
