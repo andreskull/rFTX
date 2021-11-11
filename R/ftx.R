@@ -5,6 +5,9 @@
 #' @importFrom logging logerror loginfo
 #' @importFrom tibble tibble as_tibble add_column
 #' @importFrom purrr set_names map_df
+#' @importFrom rlang := 
+
+utils::globalVariables(c("."))
 
 base_url <- "https://ftx.com"
 
