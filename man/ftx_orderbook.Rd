@@ -26,5 +26,5 @@ data: a tibble containing the data if success is TRUE
 Returns the orderbook for the market specified
 }
 \examples{
-ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
+ftx_orderbook(key="", secret="", market = "1INCH/USD", depth = 5)
 }

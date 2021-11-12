@@ -38,5 +38,5 @@ data: a tibble containing the data if success is TRUE
 Returns the funding payments for futures
 }
 \examples{
-ftx_funding_payments(key, secret, subaccount)
+ftx_funding_payments(key="", secret="", subaccount=NA)
 }

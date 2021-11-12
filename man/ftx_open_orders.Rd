@@ -28,5 +28,5 @@ data: a tibble containing the data if success is TRUE
 Returns information on the open orders for account or subaccount if specified
 }
 \examples{
-ftx_open_orders(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+ftx_open_orders(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 }

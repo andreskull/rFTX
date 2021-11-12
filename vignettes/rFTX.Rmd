@@ -7,6 +7,7 @@ vignette: >
   %\VignetteIndexEntry{rFTX}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{tidyverse}
 ---
 
 The FTX API is described as a HTTP-based API with full trading and asset management functionality, with public orderbook and trades data as well as private account data and order management.
@@ -21,7 +22,7 @@ To use this package, you'll need to install it from GitHub or CRAN:
 
 ```{r, eval = FALSE}
 # from GitHub
-devtools::install_github("rFTX")
+devtools::install_github("andreskull/rFTX", build_vignettes = TRUE)
 
 # from CRAN
 install.packages("rFTX")
@@ -42,8 +43,6 @@ The package also has dependencies which require to be installed.
 install.packages(tidyverse)
 install.packages(digest)
 install.packages(lubridate)
-install.packages(stringi)
-install.packages(assert)
 install.packages(logging)
 install.packages(httr)
 

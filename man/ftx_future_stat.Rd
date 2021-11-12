@@ -26,5 +26,5 @@ data: a tibble containing the data if success is TRUE
 Returns stats on futures
 }
 \examples{
-ftx_future_stat(key, secret, market = "CRV-PERP") 
+ftx_future_stat(key="", secret="", market = "CRV-PERP") 
 }

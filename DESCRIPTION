@@ -8,17 +8,22 @@ Authors@R:
 Maintainer: The package maintainer <andres.a.kull@gmail.com>
 Description: R implementation of FTX REST API.
 Depends:
-    R (>= 2.15),
-    tidyverse (>= 1.3.1),
-    lubridate (>= 1.8.0),
-    logging (>= 0.10-108), 
-    httr (>= 1.4.2)
+    R (>= 2.15)
 Imports:
     vctrs (>= 0.3.8),
     digest (>= 0.6.28),
-    jsonlite (>= 1.7.2)
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    jsonlite (>= 1.7.2),
+    tidyverse (>= 1.3.1),
+    dplyr (>= 1.0.7),
+    magrittr (>= 2.0.1),
+    lubridate (>= 1.8.0),
+    logging (>= 0.10-108), 
+    httr (>= 1.4.2),
+    tibble (>= 3.1.4),
+    purrr (>= 0.3.4),
+    rlang (>= 0.4.11),
+    utils (>= 4.1.1)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

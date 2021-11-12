@@ -1,7 +1,13 @@
-library(tidyverse)
-library(lubridate)
-library(logging)
-library(httr)
+#' @importFrom magrittr %>%
+#' @importFrom lubridate now
+#' @importFrom httr GET POST DELETE add_headers content
+#' @importFrom dplyr bind_rows mutate filter select
+#' @importFrom logging logerror loginfo
+#' @importFrom tibble tibble as_tibble add_column
+#' @importFrom purrr set_names map_df
+#' @importFrom rlang := 
+
+utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size"))
 
 base_url <- "https://ftx.com"
 
@@ -18,7 +24,6 @@ base_url <- "https://ftx.com"
 #' @param ... Additional parameters to pass to API request
 #' @return A response object as a list containing two elements, a logical vector success of 1 length and 
 #' either an error element if success is FALSE or result list if success is TRUE.,
-#' @examples ftx_send_request(method = "GET", path = "/api/funding_rates", key = "", secret = "")
 #' @noRd 
 
 ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
@@ -104,7 +109,7 @@ format_helper <- function(obj, time_label, tz){
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_coin_balances(key, secret, accounts = c())
+#' @examples ftx_coin_balances(key="", secret="", accounts = c())
 #' @export
 
 ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
@@ -149,7 +154,7 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_positions(key, secret, subaccount=NA)
+#' @examples ftx_positions(key="", secret="", subaccount=NA)
 #' @export
 
 ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
@@ -182,7 +187,7 @@ ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_coin_markets(key, secret)
+#' @examples ftx_coin_markets(key="", secret="")
 #' @export
 
 ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
@@ -211,7 +216,7 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_orderbook(key, secret, market = "1INCH/USD", depth = 5)
+#' @examples ftx_orderbook(key="", secret="", market = "1INCH/USD", depth = 5)
 #' @export
 
 ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
@@ -256,7 +261,7 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_trades(key, secret, market = "1INCH/USD")
+#' @examples ftx_trades(key="", secret="", market = "1INCH/USD")
 #' @export
 
 ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -308,7 +313,7 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_historical_prices(key, secret, market = "1INCH/USD")
+#' @examples ftx_historical_prices(key="", secret="", market = "1INCH/USD")
 #' @export
 
 ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -369,7 +374,7 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_future_markets(key, secret)
+#' @examples ftx_future_markets(key="", secret="")
 #' @export
 
 ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
@@ -407,7 +412,7 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_future_stat(key, secret, market = "CRV-PERP") 
+#' @examples ftx_future_stat(key="", secret="", market = "CRV-PERP") 
 #' @export
 
 ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
@@ -441,7 +446,7 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_future_funding_rates(key, secret, markets=c('CRV-PERP','XRP-PERP'))
+#' @examples ftx_future_funding_rates(key="", secret="", markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
 ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
@@ -494,7 +499,7 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_open_orders(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+#' @examples ftx_open_orders(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
 ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
@@ -531,7 +536,7 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_orders_history(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+#' @examples ftx_orders_history(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
 ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
@@ -575,8 +580,8 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_place_order(key, secret, subaccount, market="XRP-PERP", side="buy", price=1, type="limit", size=3, 
-#' reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, clientId=NA)
+#' @examples ftx_place_order(key="",secret="",subaccount=NA,market="XRP-PERP",
+#' side="buy",price=1,type="limit",size=3)
 #' @export
 
 ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT", ...) {
@@ -636,7 +641,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_modify_order(key, secret, subaccount, order_id, size, price)
+#' @examples ftx_modify_order(key="", secret="", subaccount=NA, order_id=1234, size=2, price=1)
 #' @export
 
 ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz = "GMT", ...) {
@@ -680,7 +685,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_order_status(key, secret, subaccount, order_id)
+#' @examples ftx_order_status(key="", secret="", subaccount=NA, order_id=1234)
 #' @export
 
 ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...) {
@@ -718,7 +723,7 @@ ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...)
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' result: if success is TRUE: "Order queued for cancellation"
-#' @examples ftx_cancel_order(key, secret, subaccount, order_id)
+#' @examples ftx_cancel_order(key="", secret="", subaccount="", order_id=1234)
 #' @export
 
 ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
@@ -750,7 +755,8 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_modify_order_clientid(key, secret, subaccount, client_id, new_client_id, size, price)
+#' @examples ftx_modify_order_clientid(key="", secret="", subaccount=NA, client_id="order1", 
+#' new_client_id="order2", size=2, price=1)
 #' @export
 
 ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, tz = "GMT", ...) {
@@ -799,7 +805,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_cl
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_order_status_clientid(key, secret, subaccount, client_id)
+#' @examples ftx_order_status_clientid(key="", secret="", subaccount=NA, client_id="order1")
 #' @export
 
 ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "GMT", ...) {
@@ -837,7 +843,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' result: if success is TRUE: "Order queued for cancellation"
-#' @examples ftx_cancel_order_clientid(key, secret, subaccount, client_id)
+#' @examples ftx_cancel_order_clientid(key="", secret="", subaccount=NA, client_id="order1")
 #' @export
 
 ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
@@ -868,7 +874,7 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_order_fills(key, secret, subaccount, markets=c('CRV-PERP','XRP-PERP'))
+#' @examples ftx_order_fills(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
 ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
@@ -921,7 +927,7 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_funding_payments(key, secret, subaccount)
+#' @examples ftx_funding_payments(key="", secret="", subaccount=NA)
 #' @export
 
 ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, tz = "GMT", ...) {
@@ -966,7 +972,7 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_spot_lending_history(key, secret)
+#' @examples ftx_spot_lending_history(key="", secret="")
 #' @export
 
 ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz = "GMT", ...) {
@@ -1011,7 +1017,7 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_spot_margin_borrow_rates(key, secret, subaccount)
+#' @examples ftx_spot_margin_borrow_rates(key="", secret="", subaccount=NA)
 #' @export
 
 ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
@@ -1043,7 +1049,7 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ..
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_my_spot_borrow_history(key, secret, subaccount)
+#' @examples ftx_my_spot_borrow_history(key="", secret="", subaccount=NA)
 #' @export
 
 ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, tz = "GMT", ...) {

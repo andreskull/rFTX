@@ -38,5 +38,5 @@ data: a tibble containing the data if success is TRUE
 Returns the coin borrow history for the user
 }
 \examples{
-ftx_my_spot_borrow_history(key, secret, subaccount)
+ftx_my_spot_borrow_history(key="", secret="", subaccount=NA)
 }

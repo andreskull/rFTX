@@ -41,5 +41,5 @@ data: a tibble containing the data if success is TRUE
 Returns historical prices of expired futures
 }
 \examples{
-ftx_historical_prices(key, secret, market = "1INCH/USD")
+ftx_historical_prices(key="", secret="", market = "1INCH/USD")
 }

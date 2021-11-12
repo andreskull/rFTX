@@ -26,5 +26,5 @@ data: a tibble containing the data if success is TRUE
 Returns the account positions
 }
 \examples{
-ftx_positions(key, secret, subaccount=NA)
+ftx_positions(key="", secret="", subaccount=NA)
 }

@@ -26,5 +26,5 @@ data: a tibble containing the data if success is TRUE
 Returns all types of futures on FTX
 }
 \examples{
-ftx_future_markets(key, secret)
+ftx_future_markets(key="", secret="")
 }
