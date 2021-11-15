@@ -46,14 +46,14 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
                    `FTX-SIGN` = signature,
                    `FTX-TS` = as.character(ts))
   
-  if(!missing(subaccount)){
+  if(!missing(subaccount) && !is.na(subaccount)){
     headers_vec <- c(headers_vec, `FTX-SUBACCOUNT` = subaccount)
   }
   
   r <- fn(url, add_headers(.headers = headers_vec), ...)
   
   if(method == "POST" & !missing(body)){
-    r <- fn(url, add_headers(.headers = headers_vec), body = body, encode = "json", ...)
+    r <- fn(url, add_headers(.headers = headers_vec), body = body, encode = "json", ...)  
   }
   
   response <- content(r, "parsed")
