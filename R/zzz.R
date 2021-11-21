@@ -1,6 +1,7 @@
-pkg.env <- new.env(parent = emptyenv())
-pkg.env$base_url <- NA
+#' @importFrom utils assignInMyNamespace
+
+base_url <- NA
 
 .onLoad <- function(libname, pkgname) {
-  base_url <- ftx_init()
+  assignInMyNamespace("base_url", ftx_init())
 }
