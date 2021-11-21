@@ -9,7 +9,11 @@
 
 utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size"))
 
-base_url <- "https://ftx.com"
+ftx_init <- function(){
+  endpoints <- c("https://ftx.com")
+  print(paste("Using https://ftx.com as the default endpoint."))
+  rftx_base_url <- endpoints
+}
 
 #' @title FTX Send Request
 #' @description A helper function
