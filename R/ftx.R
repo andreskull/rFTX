@@ -11,7 +11,7 @@ utils::globalVariables(c(".", "total", "account", "future", "startTime", "high",
 
 
 #' @title FTX Initialise Endpoint Value
-#' @description Changes the deafult endpoint value. Default endpoint is https://ftx.com
+#' @description Changes the default endpoint value. Default endpoint is https://ftx.com
 #' @param rftx_base_url Optional parameter. An endpoint value such as https://ftx.com or https://ftx.us
 #' @export
 ftx_init <- function(rftx_base_url = NA){
