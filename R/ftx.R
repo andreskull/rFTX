@@ -7,9 +7,25 @@
 #' @importFrom purrr set_names map_df
 #' @importFrom rlang := 
 
-utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size"))
+utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size", "base_url"))
 
-base_url <- "https://ftx.com"
+
+#' @title FTX Initialise Endpoint Value
+#' @description Changes the default endpoint value. Default endpoint is https://ftx.com
+#' @param rftx_base_url Optional parameter. An endpoint value such as https://ftx.com or https://ftx.us
+#' @export
+
+ftx_init <- function(rftx_base_url = NA){
+  if(!missing(rftx_base_url) & !is.na(rftx_base_url)){
+    utils::assignInNamespace("base_url", rftx_base_url, ns="rFTX", envir=as.environment("package:rFTX"))
+  } else {
+    endpoints <- c("https://ftx.com", "https://ftx.us")
+    selected_url <- utils::menu(endpoints, title = "\nWhich endpoint would you like to use?")
+    print(paste("Using", endpoints[selected_url], "as the endpoint."))
+    ftx_base_url <- endpoints[selected_url]
+    utils::assignInNamespace("base_url", ftx_base_url, ns="rFTX", envir=as.environment("package:rFTX"))
+  }
+}
 
 #' @title FTX Send Request
 #' @description A helper function
