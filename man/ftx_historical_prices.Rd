@@ -8,11 +8,11 @@ ftx_historical_prices(
   key,
   secret,
   market,
+  ...,
   resolution = 14400,
   start_time = NA,
   end_time = NA,
-  tz = "GMT",
-  ...
+  tz = "GMT"
 )
 }
 \arguments{
@@ -22,6 +22,8 @@ ftx_historical_prices(
 
 \item{market}{Name of market}
 
+\item{...}{Additional parameters to pass to API request}
+
 \item{resolution}{Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400}
 
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
@@ -29,8 +31,6 @@ ftx_historical_prices(
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
-
-\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

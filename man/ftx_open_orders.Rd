@@ -4,7 +4,7 @@
 \alias{ftx_open_orders}
 \title{FTX Open Orders}
 \usage{
-ftx_open_orders(key, secret, subaccount, markets = c(), tz = "GMT", ...)
+ftx_open_orders(key, secret, subaccount, ..., markets = c(), tz = "GMT")
 }
 \arguments{
 \item{key}{A client's key}
@@ -13,11 +13,11 @@ ftx_open_orders(key, secret, subaccount, markets = c(), tz = "GMT", ...)
 
 \item{subaccount}{A client's subaccount}
 
+\item{...}{Additional parameters to pass to API request}
+
 \item{markets}{Vector of names of markets.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
-
-\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

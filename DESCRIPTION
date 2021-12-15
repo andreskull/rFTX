@@ -1,7 +1,7 @@
 Package: rFTX
 Type: Package
-Title: Connecting to FTX API
-Version: 0.0.0.9000
+Title: R package for FTX API
+Version: 0.1.0
 Authors@R: 
     c(person("Andres", "Kull", email = "andres.a.kull@gmail.com",role = c("aut", "cre")),
     person("Pauline", "Developer", role = "ctb", email = "paunimo@gmail.com"))

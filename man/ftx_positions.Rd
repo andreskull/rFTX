@@ -4,18 +4,18 @@
 \alias{ftx_positions}
 \title{FTX Positions}
 \usage{
-ftx_positions(key, secret, subaccount = NA, tz = "GMT", ...)
+ftx_positions(key, secret, ..., subaccount = NA, tz = "GMT")
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
+\item{...}{Additional parameters to pass to API request}
+
 \item{subaccount}{A client's subaccount}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
-
-\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

@@ -4,7 +4,7 @@
 \alias{ftx_order_status}
 \title{FTX Order Status}
 \usage{
-ftx_order_status(key, secret, subaccount, order_id, tz = "GMT", ...)
+ftx_order_status(key, secret, subaccount, order_id, ..., tz = "GMT")
 }
 \arguments{
 \item{key}{A client's key}
@@ -15,9 +15,9 @@ ftx_order_status(key, secret, subaccount, order_id, tz = "GMT", ...)
 
 \item{order_id}{Numeric value of order ID}
 
-\item{tz}{Timezone to display times in. Default is GMT.}
-
 \item{...}{Additional parameters to pass to API request}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
