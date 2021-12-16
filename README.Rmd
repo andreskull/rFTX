@@ -26,9 +26,10 @@ rFTX package is not yet on CRAN but it will soon be.
 
 You can install the development version from [GitHub](https://github.com/) with:
 
-``` r
+``` {r}
 devtools::install_github("andreskull/rFTX", build_vignettes = TRUE)
 ```
+
 ## GET Example
 
 This is a basic example which shows you how to fetch trades data for a particular market:
