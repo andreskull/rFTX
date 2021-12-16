@@ -4,16 +4,16 @@
 \alias{ftx_coin_balances}
 \title{FTX Coin Balances}
 \usage{
-ftx_coin_balances(key, secret, accounts = c(), ...)
+ftx_coin_balances(key, secret, ..., accounts = c())
 }
 \arguments{
 \item{key}{A client's key}
 
 \item{secret}{A client's secret}
 
-\item{accounts}{Optional parameter. A vector of client sub-accounts}
-
 \item{...}{Additional parameters to pass to API request}
+
+\item{accounts}{Optional parameter. A vector of client sub-accounts}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

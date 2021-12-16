@@ -4,7 +4,7 @@
 #' @importFrom dplyr bind_rows mutate filter select
 #' @importFrom logging logerror loginfo
 #' @importFrom tibble tibble as_tibble add_column
-#' @importFrom purrr set_names map_df
+#' @importFrom purrr set_names map_df map
 #' @importFrom rlang := 
 
 utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size", "base_url"))
@@ -37,20 +37,22 @@ ftx_init <- function(rftx_base_url = NA){
 #' @param body Only for POST method. A named list of values containing market name (string), 
 #' side ("buy" or "sell"), price (numeric), size (numeric), type ("limit" or "market"), 
 #' reduceOnly (logical), ioc (logical), postOnly (logical) and clientId (numeric or NA)
+#' @param query parameters to pass with url
 #' @param ... Additional parameters to pass to API request
 #' @return A response object as a list containing two elements, a logical vector success of 1 length and 
 #' either an error element if success is FALSE or result list if success is TRUE.,
 #' @noRd 
 
-ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
+ftx_send_request <- function(method, path, key, secret, subaccount, body = NULL, query = NULL, ...) {
+  
   url <- paste0(base_url, path)
   fn <- get(method)
   
   ts <- now("UTC") %>% as.integer() * 1000
   signature_payload <- paste0(ts, method, path)
   
-  if(method == "POST" & !missing(body)){
-    body_sign <- jsonlite::toJSON(body, auto_unbox = T)
+  if(method == "POST" & !missing(body) & !is.null(body)){
+    body_sign <- jsonlite::toJSON(body, POSIXt = "epoch", complex = "string", null = "null", na = "null", digits = NA, auto_unbox = T)
     signature_payload <- paste0(signature_payload, body_sign)
   }
   
@@ -66,10 +68,10 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body, ...) {
     headers_vec <- c(headers_vec, `FTX-SUBACCOUNT` = subaccount)
   }
   
-  r <- fn(url, add_headers(.headers = headers_vec), ...)
+  r <- fn(url, add_headers(.headers = headers_vec), query = query, ...)
   
   if(method == "POST" & !missing(body)){
-    r <- fn(url, add_headers(.headers = headers_vec), body = body, encode = "json", ...)  
+    r <- fn(url, add_headers(.headers = headers_vec), query = query, body = body, encode = "json", ...)  
   }
   
   response <- content(r, "parsed")
@@ -120,16 +122,16 @@ format_helper <- function(obj, time_label, tz){
 #' @description Returns balances coin balances of all accounts if accounts argument is left empty or returns the balances of the specified accounts.
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param accounts Optional parameter. A vector of client sub-accounts
 #' @param ... Additional parameters to pass to API request
+#' @param accounts Optional parameter. A vector of client sub-accounts
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_coin_balances(key="", secret="", accounts = c())
 #' @export
 
-ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
-  response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, subaccount = NA, body = NULL, ...)
+ftx_coin_balances <- function(key, secret, ..., accounts = c()) {
+  response = ftx_send_request(method = "GET", path = '/api/wallet/all_balances', key, secret, subaccount = NA, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   # add response$success == FALSE handling
@@ -164,18 +166,18 @@ ftx_coin_balances <- function(key, secret, accounts = c(), ...) {
 #' @description Returns the account positions
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param ... Additional parameters to pass to API request
 #' @param subaccount A client's subaccount
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_positions(key="", secret="", subaccount=NA)
 #' @export
 
-ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
+ftx_positions <- function(key, secret, ..., subaccount = NA, tz = "GMT") {
   # GET /positions
-  response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = '/api/positions', key, secret, subaccount, body = NULL, query = NULL,  ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
@@ -198,17 +200,17 @@ ftx_positions <- function(key, secret, subaccount = NA, tz = "GMT", ...) {
 #' @description Returns information on all types of markets on FTX
 #' @param key A client's key
 #' @param secret A client's secret
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_coin_markets(key="", secret="")
 #' @export
 
-ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
+ftx_coin_markets <- function(key, secret, ..., tz = "GMT") {
   # GET /markets
-  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, subaccount = NA, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, subaccount = NA, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
@@ -226,16 +228,16 @@ ftx_coin_markets <- function(key, secret, tz = "GMT", ...) {
 #' @description Returns the orderbook for the market specified
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param ... Additional parameters to pass to API request
 #' @param market Name of market
 #' @param depth Market depth. Min 1, Max 100, default 5
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_orderbook(key="", secret="", market = "1INCH/USD", depth = 5)
 #' @export
 
-ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
+ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
   if(depth > 100) loginfo(msg = 'Depth value is too large. Using max value = 100.')
@@ -244,8 +246,9 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
     return(list(success = F, failure_reason = 'Depth value is too small. Min value is 1.', data = NULL))
   }
   
-  path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, ...)
+  # path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
+  path = paste0('/api/markets/', market, '/orderbook')
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, query = list(depth = depth), ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -270,17 +273,17 @@ ftx_orderbook <- function(key, secret, market = NA, depth = 5, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
+#' @param ... Additional parameters to pass to API request
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_trades(key="", secret="", market = "1INCH/USD")
 #' @export
 
-ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz = "GMT", ...) {
+ftx_trades <- function(key, secret, market, ..., start_time = NA, end_time = NA, tz = "GMT") {
   # GET /markets/{market}/trades
   # add optional parameters
   path = paste0('/api/markets/', market, '/trades')
@@ -321,18 +324,18 @@ ftx_trades <- function(key, secret, market, start_time = NA, end_time = NA, tz =
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
+#' @param ... Additional parameters to pass to API request
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_historical_prices(key="", secret="", market = "1INCH/USD")
 #' @export
 
-ftx_historical_prices <- function(key, secret, market, resolution = 14400, start_time = NA, end_time = NA, tz = "GMT", ...) {
+ftx_historical_prices <- function(key, secret, market, ..., resolution = 14400, start_time = NA, end_time = NA, tz = "GMT") {
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
   # check if resolution, start_time and end_time are correct and not contradictory, log error if not
   # check resolution parameter
@@ -384,23 +387,23 @@ ftx_historical_prices <- function(key, secret, market, resolution = 14400, start
 #' @description Returns all types of futures on FTX
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param ... Additional parameters to pass to API request
 #' @param market Name of market
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_future_markets(key="", secret="")
 #' @export
 
-ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
+ftx_future_markets <- function(key, secret, ..., market = NA, tz = "GMT") {
   # GET /futures (if market == NA)
   # GET /futures/{market} (if market != NA)
   path = paste0('/api/futures')
   if(!is.na(market)){
     path = paste0(path, '/', market)
   }
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -423,19 +426,19 @@ ftx_future_markets <- function(key, secret, market = NA, tz = "GMT", ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param market Name of market
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_future_stat(key="", secret="", market = "CRV-PERP") 
 #' @export
 
-ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
+ftx_future_stat <-  function(key, secret, market, ..., tz = "GMT") {
   # GET /futures/{market}/stats
 
   path = paste0('/api/futures/', market, '/stats')
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -454,18 +457,18 @@ ftx_future_stat <-  function(key, secret, market, tz = "GMT", ...) {
 #' @description Returns the funding rates of futures
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param ... Additional parameters to pass to API request
 #' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
 #' @param end_time POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_future_funding_rates(key="", secret="", markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
-ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
+ftx_future_funding_rates <-  function(key, secret, ..., markets=c(), start_time=NA, end_time=NA, tz = "GMT") {
   # GET /funding_rates
   # checks on start and end times
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
@@ -509,20 +512,20 @@ ftx_future_funding_rates <-  function(key, secret, markets=c(), start_time=NA, e
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param ... Additional parameters to pass to API request
 #' @param markets Vector of names of markets. 
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_open_orders(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
-ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
+ftx_open_orders <- function(key, secret, subaccount, ..., markets=c(), tz = "GMT") {
   # GET /orders?market={market}
   path = paste0('/api/orders')
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -546,20 +549,20 @@ ftx_open_orders <- function(key, secret, subaccount, markets=c(), tz = "GMT", ..
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param ... Additional parameters to pass to API request
 #' @param markets Vector of names of markets. 
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_orders_history(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
-ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT", ...) {
+ftx_orders_history <- function(key, secret, subaccount, ..., markets=c(), tz = "GMT") {
   # GET /orders/history?market={market}
   path = paste0('/api/orders/history')
 
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
   
@@ -582,6 +585,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param ... Additional parameters to pass to API request
 #' @param market Name of market
 #' @param side "buy" or "sell"
 #' @param price Numeric value. Send null for market orders.
@@ -592,7 +596,6 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' @param postOnly optional; default is false
 #' @param client_id optional; client order id
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
@@ -600,7 +603,7 @@ ftx_orders_history <- function(key, secret, subaccount, markets=c(), tz = "GMT",
 #' side="buy",price=1,type="limit",size=3)
 #' @export
 
-ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT", ...) {
+ftx_place_order <-  function(key, secret, subaccount, ..., market=NA, side=NA, price=NA, type=NA, size=NA, reduceOnly=FALSE, ioc=FALSE, postOnly=FALSE, client_id=NA, tz = "GMT") {
 
   # POST /orders
   # check if side, price, type, size, reduce_only, ioc, postonly parameters are correct
@@ -629,7 +632,7 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
   if(ioc %in% c(T,F)) body$ioc = ioc
   if(postOnly %in% c(T,F)) body$postOnly = postOnly
   body$clientId = client_id
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -652,15 +655,15 @@ ftx_place_order <-  function(key, secret, subaccount, market=NA, side=NA, price=
 #' @param order_id Numeric value of order ID
 #' @param size Size of order
 #' @param price Price of order 
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_modify_order(key="", secret="", subaccount=NA, order_id=1234, size=2, price=1)
 #' @export
 
-ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz = "GMT", ...) {
+ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, ..., tz = "GMT") {
   # POST /orders/{order_id}/modify
   path = paste0('/api/orders/', order_id, '/modify')
   body <- list()
@@ -675,7 +678,7 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
     }
   }
   
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -696,18 +699,18 @@ ftx_modify_order <- function(key, secret, subaccount, order_id, size, price, tz 
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param order_id Numeric value of order ID
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_order_status(key="", secret="", subaccount=NA, order_id=1234)
 #' @export
 
-ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...) {
+ftx_order_status <- function(key, secret, subaccount, order_id, ..., tz = "GMT") {
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/', order_id)
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -745,7 +748,7 @@ ftx_order_status <- function(key, secret, subaccount, order_id, tz = "GMT", ...)
 ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
   # DELETE /orders/{order_id}
   path = paste0('/api/orders/', order_id)
-  response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -766,8 +769,8 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' @param new_client_id Character string of new client order ID
 #' @param size Size of order
 #' @param price Price of order 
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
@@ -775,7 +778,7 @@ ftx_cancel_order <- function(key, secret, subaccount, order_id, ...) {
 #' new_client_id="order2", size=2, price=1)
 #' @export
 
-ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, tz = "GMT", ...) {
+ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_client_id, size, price, ..., tz = "GMT") {
 
   # POST /orders/by_client_id/{client_order_id}/modify
   path = paste0('/api/orders/by_client_id/', client_id, '/modify')
@@ -795,7 +798,7 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_cl
     body$clientId = new_client_id
   }
   
-  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, ...)
+  response = ftx_send_request(method = "POST", path = path, key, secret, subaccount, body = body, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -816,18 +819,18 @@ ftx_modify_order_clientid <- function(key, secret, subaccount, client_id, new_cl
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
 #' @param client_id Character string of client order ID
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_order_status_clientid(key="", secret="", subaccount=NA, client_id="order1")
 #' @export
 
-ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "GMT", ...) {
+ftx_order_status_clientid <- function(key, secret, subaccount, client_id, ..., tz = "GMT") {
   # GET /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/by_client_id/', client_id)
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -865,7 +868,7 @@ ftx_order_status_clientid <- function(key, secret, subaccount, client_id, tz = "
 ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
   # DELETE /orders/by_client_id/{client_order_id}
   path = paste0('/api/orders/by_client_id/', client_id)
-  response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "DELETE", path = path, key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -882,18 +885,18 @@ ftx_cancel_order_clientid <- function(key, secret, subaccount, client_id, ...) {
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param ... Additional parameters to pass to API request
 #' @param markets Vector of names of markets. 
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_order_fills(key="", secret="", subaccount=NA, markets=c('CRV-PERP','XRP-PERP'))
 #' @export
 
-ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA, end_time=NA, tz = "GMT", ...) {
+ftx_order_fills <- function(key, secret, subaccount, ..., markets=c(), start_time=NA, end_time=NA, tz = "GMT") {
   # GET /fills?market={market} 
   path = '/api/fills'
   
@@ -936,17 +939,17 @@ ftx_order_fills <- function(key, secret, subaccount, markets=c(), start_time=NA,
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param ... Additional parameters to pass to API request
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_funding_payments(key="", secret="", subaccount=NA)
 #' @export
 
-ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_time = NA, tz = "GMT", ...) {
+ftx_funding_payments <-  function(key, secret, subaccount, ..., start_time = NA, end_time = NA, tz = "GMT") {
   # GET /funding_payments
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
@@ -981,17 +984,17 @@ ftx_funding_payments <-  function(key, secret, subaccount, start_time = NA, end_
 #' @description Returns the lending history for coins
 #' @param key A client's key
 #' @param secret A client's secret
+#' @param ... Additional parameters to pass to API request
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_spot_lending_history(key="", secret="")
 #' @export
 
-ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz = "GMT", ...) {
+ftx_spot_lending_history <- function(key, secret, ..., start_time=NA, end_time=NA, tz = "GMT") {
   # GET /spot_margin/history
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
@@ -1028,17 +1031,17 @@ ftx_spot_lending_history <- function(key, secret, start_time=NA, end_time=NA, tz
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
-#' @param tz Timezone to display times in. Default is GMT.
 #' @param ... Additional parameters to pass to API request
+#' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_spot_margin_borrow_rates(key="", secret="", subaccount=NA)
 #' @export
 
-ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ...) {
+ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, ..., tz = "GMT") {
   # GET /spot_margin/borrow_rates
-  response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_rates', key, secret, subaccount, body = NULL, ...)
+  response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_rates', key, secret, subaccount, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -1058,17 +1061,17 @@ ftx_spot_margin_borrow_rates <- function(key, secret, subaccount, tz = "GMT", ..
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param subaccount A client's subaccount
+#' @param ... Additional parameters to pass to API request
 #' @param start_time Optional parameter. POSIXct value from when to extract trades.
 #' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
 #' @param tz Timezone to display times in. Default is GMT.
-#' @param ... Additional parameters to pass to API request
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
 #' @examples ftx_my_spot_borrow_history(key="", secret="", subaccount=NA)
 #' @export
 
-ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, end_time=NA, tz = "GMT", ...) {
+ftx_my_spot_borrow_history <- function(key, secret, subaccount, ..., start_time=NA, end_time=NA, tz = "GMT") {
   # GET /spot_margin/borrow_history
   if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
     if(start_time > end_time){
@@ -1078,10 +1081,10 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, start_time=NA, e
   query_list <- list()
   
   if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.integer(start_time)
+    query_list['start_time'] <- as.character(as.integer(start_time))
   }
   if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.integer(end_time)
+    query_list['end_time'] <- as.character(as.integer(end_time))
   }
   response = ftx_send_request(method = "GET", path = '/api/spot_margin/borrow_history', key, secret, 
                               subaccount, body = NULL, query = query_list, ...)

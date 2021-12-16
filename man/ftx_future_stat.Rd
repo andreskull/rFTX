@@ -4,7 +4,7 @@
 \alias{ftx_future_stat}
 \title{FTX Future Stats}
 \usage{
-ftx_future_stat(key, secret, market, tz = "GMT", ...)
+ftx_future_stat(key, secret, market, ..., tz = "GMT")
 }
 \arguments{
 \item{key}{A client's key}
@@ -13,9 +13,9 @@ ftx_future_stat(key, secret, market, tz = "GMT", ...)
 
 \item{market}{Name of market}
 
-\item{tz}{Timezone to display times in. Default is GMT.}
-
 \item{...}{Additional parameters to pass to API request}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

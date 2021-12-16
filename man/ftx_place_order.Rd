@@ -8,6 +8,7 @@ ftx_place_order(
   key,
   secret,
   subaccount,
+  ...,
   market = NA,
   side = NA,
   price = NA,
@@ -17,8 +18,7 @@ ftx_place_order(
   ioc = FALSE,
   postOnly = FALSE,
   client_id = NA,
-  tz = "GMT",
-  ...
+  tz = "GMT"
 )
 }
 \arguments{
@@ -27,6 +27,8 @@ ftx_place_order(
 \item{secret}{A client's secret}
 
 \item{subaccount}{A client's subaccount}
+
+\item{...}{Additional parameters to pass to API request}
 
 \item{market}{Name of market}
 
@@ -47,8 +49,6 @@ ftx_place_order(
 \item{client_id}{optional; client order id}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
-
-\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

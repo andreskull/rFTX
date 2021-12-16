@@ -8,10 +8,10 @@ ftx_trades(
   key,
   secret,
   market,
+  ...,
   start_time = NA,
   end_time = NA,
-  tz = "GMT",
-  ...
+  tz = "GMT"
 )
 }
 \arguments{
@@ -21,13 +21,13 @@ ftx_trades(
 
 \item{market}{Name of market}
 
+\item{...}{Additional parameters to pass to API request}
+
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
 
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
-
-\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

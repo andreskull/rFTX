@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rFTX is to provide a way of making GET, POST and DELETE requests in R via the FTX REST API. The user is required to have an FTX account as the account’s API key and secret key is used in authentication. These can be created here: https://ftx.com/profile. If you are using a subaccount, some functions allow the name as an argument. This can be left out if not using subaccounts.
+The goal of rFTX is to provide R interface for FTX REST API. The user is required to have an FTX account as the account’s API key and secret key is used in authentication. These can be created here: https://ftx.com/profile. If you are using a subaccount, some functions allow the name as an argument. This can be left out if not using subaccounts.
 
 ## Installation
 

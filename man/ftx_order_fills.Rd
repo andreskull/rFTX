@@ -8,11 +8,11 @@ ftx_order_fills(
   key,
   secret,
   subaccount,
+  ...,
   markets = c(),
   start_time = NA,
   end_time = NA,
-  tz = "GMT",
-  ...
+  tz = "GMT"
 )
 }
 \arguments{
@@ -22,6 +22,8 @@ ftx_order_fills(
 
 \item{subaccount}{A client's subaccount}
 
+\item{...}{Additional parameters to pass to API request}
+
 \item{markets}{Vector of names of markets.}
 
 \item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
@@ -29,8 +31,6 @@ ftx_order_fills(
 \item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
-
-\item{...}{Additional parameters to pass to API request}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,

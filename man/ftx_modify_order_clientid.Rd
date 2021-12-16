@@ -12,8 +12,8 @@ ftx_modify_order_clientid(
   new_client_id,
   size,
   price,
-  tz = "GMT",
-  ...
+  ...,
+  tz = "GMT"
 )
 }
 \arguments{
@@ -31,9 +31,9 @@ ftx_modify_order_clientid(
 
 \item{price}{Price of order}
 
-\item{tz}{Timezone to display times in. Default is GMT.}
-
 \item{...}{Additional parameters to pass to API request}
+
+\item{tz}{Timezone to display times in. Default is GMT.}
 }
 \value{
 A list of three elements: a logical vector success: FALSE/TRUE,
