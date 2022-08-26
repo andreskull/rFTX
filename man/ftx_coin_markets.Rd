@@ -21,8 +21,8 @@ failure_reason: reason for failure if success is FALSE, NA otherwise,
 data: a tibble containing the data if success is TRUE
 }
 \description{
-Returns information on all types of markets on FTX
+Returns information on all types of markets on FTX (deprecated).
 }
 \examples{
-ftx_coin_markets(key="", secret="")
+ftx_coin_markets(key = "", secret = "")
 }

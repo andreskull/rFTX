@@ -15,17 +15,17 @@ ftx_trades(
 )
 }
 \arguments{
-\item{key}{A client's key}
+\item{key}{A client's key (deprecated)}
 
-\item{secret}{A client's secret}
+\item{secret}{A client's secret (deprecated)}
 
 \item{market}{Name of market}
 
 \item{...}{Additional parameters to pass to API request}
 
-\item{start_time}{Optional parameter. POSIXct value from when to extract trades.}
+\item{start_time}{Optional parameter. POSIXct value from when to extract trades. Default value end_value - 5 minutes.}
 
-\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.}
+\item{end_time}{Optional parameter. POSIXct value up-to when to extract trades.Default value is current time.}
 
 \item{tz}{Timezone to display times in. Default is GMT.}
 }
@@ -38,5 +38,5 @@ data: a tibble containing the data if success is TRUE
 Returns the trades that have taken place for a particular market
 }
 \examples{
-ftx_trades(key="", secret="", market = "1INCH/USD")
+ftx_trades(market = "1INCH/USD")
 }

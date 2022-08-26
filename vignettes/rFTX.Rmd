@@ -7,7 +7,6 @@ vignette: >
   %\VignetteIndexEntry{rFTX}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{tidyverse}
 ---
 
 The FTX API is described as a HTTP-based API with full trading and asset management functionality, with public orderbook and trades data as well as private account data and order management.
@@ -40,7 +39,6 @@ The package also has dependencies which require to be installed.
 * httr for making REST API requests
 
 ```{r, eval=FALSE}
-install.packages(tidyverse)
 install.packages(digest)
 install.packages(lubridate)
 install.packages(logging)

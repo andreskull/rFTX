@@ -7,7 +7,6 @@
 #  
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  install.packages(tidyverse)
 #  install.packages(digest)
 #  install.packages(lubridate)
 #  install.packages(logging)
