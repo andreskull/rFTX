@@ -23,3 +23,8 @@ dataframe of prices if API call was successful
 \description{
 Get hourly resolution historical data of multiple FTX markets
 }
+\examples{
+ftx_get_hourly_markets(c("BTC-PERP", "ETH-PERP"), 
+                       start_date = "2019-07-20", end_date = "2022-06-30")
+
+}

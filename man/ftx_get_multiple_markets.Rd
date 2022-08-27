@@ -26,3 +26,9 @@ dataframe of prices if API call was successful
 \description{
 Get market data for multipole FTX markets.
 }
+\examples{
+ftx_get_multiple_markets(c("BTC-PERP", "ETH-PERP"), 
+                         resolution = 86400, 
+                         start_time = "2019-07-20", 
+                         end_time = "2022-06-30")
+}

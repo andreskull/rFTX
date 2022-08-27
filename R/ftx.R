@@ -1165,7 +1165,10 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, ..., start_time=
 #' @export
 #'
 #' @examples
-#' ftx_get_multiple_markets(c("BTC-PERP", "ETH-PERP"), resolution = 86400, start_time = "2019-07-20", end_time = "2022-06-30)
+#' ftx_get_multiple_markets(c("BTC-PERP", "ETH-PERP"), 
+#'                          resolution = 86400, 
+#'                          start_time = "2019-07-20", 
+#'                          end_time = "2022-06-30")
 ftx_get_multiple_markets <- function(markets, resolution = 86400, start_time = "2019-07-20", end_time = "2022-06-30") {
   start_time <- as.numeric(as.POSIXct(start_time, tz = "UTC"))
   end_time <- as.numeric(as.POSIXct(end_time, tz = "UTC"))
@@ -1197,7 +1200,8 @@ ftx_get_multiple_markets <- function(markets, resolution = 86400, start_time = "
 #' @export
 #'
 #' @examples
-#' ftx_get_hourly_markets(c("BTC-PERP", "ETH-PERP"), start_time = "2019-07-20", end_time = "2022-06-30)
+#' ftx_get_hourly_markets(c("BTC-PERP", "ETH-PERP"), 
+#'                        start_date = "2019-07-20", end_date = "2022-06-30")
 #' 
 ftx_get_hourly_markets <- function(markets, 
                                    start_date = "2019-07-27", 
