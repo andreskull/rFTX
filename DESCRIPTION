@@ -1,31 +1,31 @@
 Package: rFTX
 Type: Package
 Title: R package for FTX API
-Version: 0.1.0.9000
+Version: 0.1.1
 Authors@R: 
     c(person("Andres", "Kull", email = "andres.a.kull@gmail.com",role = c("aut", "cre")),
     person("Pauline", "Developer", role = "ctb", email = "paunimo@gmail.com"))
 Maintainer: The package maintainer <andres.a.kull@gmail.com>
 Description: R implementation of FTX REST API.
 Depends:
-    R (>= 2.15)
+    R (>= 3.4)
 Imports:
     digest (>= 0.6.28),
-    jsonlite (>= 1.7.2),
+    jsonlite (>= 1.8.0),
     dplyr (>= 1.0.7),
-    magrittr (>= 2.0.1),
+    magrittr (>= 2.0.3),
     lubridate (>= 1.8.0),
     logging (>= 0.10-108), 
-    httr (>= 1.4.2),
-    tibble (>= 3.1.4),
+    httr (>= 1.4.3),
+    tibble (>= 3.1.6),
     purrr (>= 0.3.4),
-    rlang (>= 0.4.11),
-    utils (>= 4.1.1),
+    rlang (>= 1.0.4),
+    utils (>= 4.1.2),
     glue (>= 1.6.2)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
