@@ -19,7 +19,7 @@ Imports:
     httr (>= 1.4.3),
     tibble (>= 3.1.6),
     purrr (>= 0.3.4),
-    rlang (>= 1.0.4),
+    rlang (>= 1.0.2),
     utils (>= 4.1.2),
     glue (>= 1.6.2)
 License: MIT + file LICENSE
