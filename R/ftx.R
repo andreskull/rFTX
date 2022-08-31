@@ -1213,8 +1213,8 @@ ftx_get_hourly_markets <- function(markets,
                     by = "month"), 
                 as.Date(end_date) + lubridate::days(1) - lubridate::hours(1)) %>% 
       tibble::as_tibble(months) %>% 
-      dplyr::mutate(end = dplyr::lead(.$value)) %>% 
-      dplyr::select(begin = .$value, .$end) %>% 
+      dplyr::mutate(end = dplyr::lead(.data$value)) %>% 
+      dplyr::select(begin = .data$value, .data$end) %>% 
       stats::na.omit()
   } else {
     months <- tibble(begin = as.Date(start_date), end = as.Date(end_date) + lubridate::days(1) - lubridate::hours(1))
