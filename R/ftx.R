@@ -187,7 +187,9 @@ ftx_coin_balances <- function(key, secret, ..., accounts = c()) {
     df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
       df <- map_df(x[[1]], tibble::as_tibble)
       df <- df %>% add_column(account = x[[2]]) %>%
-        filter(total != 0)
+        {
+          if("total" %in% names(.)) filter(total != 0) else .
+        }
     }
     ))
     
