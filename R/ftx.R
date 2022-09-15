@@ -282,7 +282,7 @@ ftx_markets <- function() {
 #' @export
 
 ftx_coin_markets <- function(key, secret, ..., tz = "GMT") {
-  .Deprecated("ftx_markets")
+  .Deprecated(new = "ftx_markets", msg = "The function will be removed in version 0.2.0")
   # GET /markets
   response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, subaccount = NA, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
@@ -313,7 +313,7 @@ ftx_coin_markets <- function(key, secret, ..., tz = "GMT") {
 
 ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
   if (!missing(key) || !missing(secret)) {
-    warning("arguments key and secret are deprecated")
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
@@ -333,12 +333,14 @@ ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   result = response$result
 
+  colnames(result$bids) <- c("price", "size")
+  colnames(result$asks) <- c("price", "size")
+  
   bids <- as_tibble(result$bids) %>% 
     mutate(name = "bids")
   asks <- as_tibble(result$asks) %>% 
     mutate(name = "asks")
-  df <- rbind(bids, asks) %>% 
-    select(price = .data$V1, size = .data$V2, name = .data$name)
+  df <- rbind(bids, asks)
   
   return_obj <- list(
     success = response$success,
@@ -366,7 +368,7 @@ ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
 ftx_trades <- function(key, secret, market, ..., start_time = NA, end_time = NA, tz = "GMT") {
   
   if (!missing(key) || !missing(secret)) {
-    warning("arguments key and secret are deprecated")
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   # GET /markets/{market}/trades
   # add optional parameters
@@ -407,7 +409,7 @@ ftx_trades <- function(key, secret, market, ..., start_time = NA, end_time = NA,
 
 ftx_historical_prices <- function(key, secret, market, ..., resolution = 14400, start_time = NA, end_time = NA, tz = "GMT") {
   if (!missing(key) || !missing(secret)) {
-    warning("arguments key and secret are deprecated")
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
   # check if resolution, start_time and end_time are correct and not contradictory, log error if not
@@ -459,7 +461,7 @@ ftx_future_markets <- function(key, secret, ..., market = NA, tz = "GMT") {
   # GET /futures (if market == NA)
   # GET /futures/{market} (if market != NA)
   if (!missing(key) || !missing(secret)) {
-    warning("arguments key and secret are deprecated")
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   path = paste0('api/futures')
   if(!is.na(market)){
@@ -496,7 +498,7 @@ ftx_future_markets <- function(key, secret, ..., market = NA, tz = "GMT") {
 
 ftx_future_stat <-  function(key, secret, market, ..., tz = "GMT") {
   if (!missing(key) || !missing(secret)) {
-    warning("arguments key and secret are deprecated")
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   # GET /futures/{market}/stats
 
@@ -533,7 +535,7 @@ ftx_future_stat <-  function(key, secret, market, ..., tz = "GMT") {
 ftx_future_funding_rates <-  function(key, secret, ..., markets=c(), start_time=NA, end_time=NA, tz = "GMT") {
   # GET /funding_rates
   if (!missing(key) || !missing(secret)) {
-    warning("arguments key and secret are deprecated")
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   
   path = 'api/funding_rates'
