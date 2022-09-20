@@ -7,13 +7,13 @@
 ftx_orderbook(key, secret, ..., market = NA, depth = 5)
 }
 \arguments{
-\item{key}{A client's key}
+\item{key}{A client's key (deprecated)}
 
-\item{secret}{A client's secret}
+\item{secret}{A client's secret (deprecated)}
 
 \item{...}{Additional parameters to pass to API request}
 
-\item{market}{Name of market}
+\item{market}{Name of market (required)}
 
 \item{depth}{Market depth. Min 1, Max 100, default 5}
 }
@@ -26,5 +26,5 @@ data: a tibble containing the data if success is TRUE
 Returns the orderbook for the market specified
 }
 \examples{
-ftx_orderbook(key="", secret="", market = "1INCH/USD", depth = 5)
+ftx_orderbook(market = "1INCH/USD", depth = 10)
 }

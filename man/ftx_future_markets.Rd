@@ -7,11 +7,11 @@
 ftx_future_markets(key, secret, ..., market = NA, tz = "GMT")
 }
 \arguments{
-\item{key}{A client's key}
+\item{key}{A client's key (deprecated)}
 
-\item{secret}{A client's secret}
+\item{secret}{A client's secret (deprecated)}
 
-\item{...}{Additional parameters to pass to API request}
+\item{...}{Additional parameters to pass to API request (deprecated)}
 
 \item{market}{Name of market}
 
@@ -26,5 +26,6 @@ data: a tibble containing the data if success is TRUE
 Returns all types of futures on FTX
 }
 \examples{
-ftx_future_markets(key="", secret="")
+ftx_future_markets()
+ftx_future_markets(market = "SOL-PERP")
 }

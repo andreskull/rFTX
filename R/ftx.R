@@ -2,10 +2,12 @@
 #' @importFrom lubridate now
 #' @importFrom httr GET POST DELETE add_headers content
 #' @importFrom dplyr bind_rows mutate filter select
-#' @importFrom logging logerror loginfo
+#' @importFrom logging logerror loginfo logwarn
 #' @importFrom tibble tibble as_tibble add_column
 #' @importFrom purrr set_names map_df map
 #' @importFrom rlang := 
+#' @importFrom rlang .data
+#' 
 
 utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size", "base_url"))
 
@@ -81,6 +83,21 @@ ftx_send_request <- function(method, path, key, secret, subaccount, body = NULL,
   response
 }
 
+#' @title FTX HTTR GET
+#' @description A helper function
+#' @param url an url that is passed to httr:GET function
+#' @return A response object as a list containing two elements, a logical vector success of 1 length and 
+#' either an error element if success is FALSE or result list if success is TRUE.,
+#' @noRd 
+
+ftx_httr_get <- function(url) {
+  response <- httr::GET(url) 
+  response <- response$content %>% 
+    rawToChar() %>% 
+    jsonlite::fromJSON()
+  response
+}
+
 #' @title Result Formatter
 #' @description A helper function
 #' @param result The result of an API response
@@ -114,6 +131,35 @@ format_helper <- function(obj, time_label, tz){
   return(df)
 }
 
+#' @title Helper Function for handling start_time and end_time parameters
+#' @description A helper function
+#' @param start_time start time of the time window range (POSIXct)
+#' @param end_time end time of the time window range (POSIXct)
+#' @param delta range to calculate start_time from end_time if start_time is NA (default lubridate::minutes(5))
+#' @param tz Timezone. Default is GMT.
+#' @return A list of start_time and end_time
+#' @noRd
+
+start_end_time <- function(start_time, end_time, delta = lubridate::minutes(5), tz = "GMT") {
+  if(!is.na(start_time) & !is.na(end_time)){
+    if(start_time > end_time){
+      logerror(msg = 'Start date cannot be after end date.')
+    }
+  }
+  
+  if (is.na(end_time)) {
+    end_time_posix <- lubridate::now(tz) 
+    end_time = end_time_posix 
+    loginfo(glue::glue("end_time parameter is missing, using end_time = {end_time_posix} "))
+  }
+  if (is.na(start_time)) {
+    start_time = end_time - delta
+    loginfo(glue::glue("start_time parameter is missing, using start_time = end_time - {delta%>% as.numeric()} seconds" ))
+  }
+  list(start_time=start_time, end_time=end_time)
+}
+
+
 # Functions should return result content in the form of dataframe if result is available and success
 # in case of response$success == FALSE the function should return the cause of failure if the FTX API provides it
 # Test with the real failure cases against FTX and decide case-by-case
@@ -141,7 +187,9 @@ ftx_coin_balances <- function(key, secret, ..., accounts = c()) {
     df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
       df <- map_df(x[[1]], tibble::as_tibble)
       df <- df %>% add_column(account = x[[2]]) %>%
-        filter(total != 0)
+        {
+          if("total" %in% names(.)) filter(., total != 0) else .
+        }
     }
     ))
     
@@ -196,8 +244,33 @@ ftx_positions <- function(key, secret, ..., subaccount = NA, tz = "GMT") {
   return(return_obj)
 }
 
+#' @title FTX Markets
+#' @description Returns information on all types of markets on FTX: spot, perpetual futures, expiring futures, and MOVE contracts. Examples for each type are BTC/USD, BTC-PERP, BTC-0626, and BTC-MOVE-1005.
+#' @return A list of three elements: a logical vector success: FALSE/TRUE, 
+#' failure_reason: reason for failure if success is FALSE, NA otherwise, 
+#' data: a tibble containing the data if success is TRUE
+#' @examples 
+#' ftx_markets()
+#' @export
+
+ftx_markets <- function() {
+  # GET /markets
+
+  response <- ftx_httr_get(glue::glue("{base_url}/api/markets")) 
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  df = as_tibble(response$result)
+  
+  return_obj <- list(
+    success = response$success,
+    failure_reason = ifelse(response$success, NA, response$error),
+    data = df
+  )
+  return(return_obj)
+}
+
+
 #' @title FTX Coin Markets
-#' @description Returns information on all types of markets on FTX
+#' @description Returns information on all types of markets on FTX (deprecated). 
 #' @param key A client's key
 #' @param secret A client's secret
 #' @param ... Additional parameters to pass to API request
@@ -205,10 +278,11 @@ ftx_positions <- function(key, secret, ..., subaccount = NA, tz = "GMT") {
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_coin_markets(key="", secret="")
+#' @examples ftx_coin_markets(key = "", secret = "")
 #' @export
 
 ftx_coin_markets <- function(key, secret, ..., tz = "GMT") {
+  .Deprecated(new = "ftx_markets", msg = "The function will be removed in version 0.2.0")
   # GET /markets
   response = ftx_send_request(method = "GET", path = '/api/markets', key, secret, subaccount = NA, body = NULL, query = NULL, ...)
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
@@ -226,18 +300,21 @@ ftx_coin_markets <- function(key, secret, ..., tz = "GMT") {
 
 #' @title FTX Orderbook
 #' @description Returns the orderbook for the market specified
-#' @param key A client's key
-#' @param secret A client's secret
+#' @param key A client's key (deprecated)
+#' @param secret A client's secret (deprecated)
 #' @param ... Additional parameters to pass to API request
-#' @param market Name of market
+#' @param market Name of market (required)
 #' @param depth Market depth. Min 1, Max 100, default 5
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_orderbook(key="", secret="", market = "1INCH/USD", depth = 5)
+#' @examples ftx_orderbook(market = "1INCH/USD", depth = 10)
 #' @export
 
 ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
+  if (!missing(key) || !missing(secret)) {
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
+  }
   # GET /markets/{market}/orderbook?depth={depth}
   # depth parameter check
   if(depth > 100) loginfo(msg = 'Depth value is too large. Using max value = 100.')
@@ -245,21 +322,26 @@ ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
     logerror(msg = 'Depth value is too small. Min value is 1.')
     return(list(success = F, failure_reason = 'Depth value is too small. Min value is 1.', data = NULL))
   }
-  
-  # path = paste0('/api/markets/', market, '/orderbook?depth=', depth)
-  path = paste0('/api/markets/', market, '/orderbook')
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, query = list(depth = depth), ...)
-  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
-  
-  result = response$result
-  
-  df <- do.call(rbind, apply(tibble(r = result, n = names(result)), 1, function(x) {
-    df <- map_df(x[[1]], tibble::as_tibble, 
-                 .name_repair = ~ vctrs::vec_as_names(...,repair="universal",quiet = T)) %>% 
-      set_names(c('price','size')) %>% 
-      add_column(name = x[[2]])
+  if (is.na(market)) {
+    logerror(msg = 'market is missing, required parameter')
+    return(list(success = F, failure_reason = 'market is missing, required parameter', data = NULL)) 
   }
-  ))
+  
+  path = paste0('api/markets/', market, '/orderbook?depth=', depth)
+
+  response <- ftx_httr_get(glue::glue("{base_url}/{path}")) 
+  if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
+  result = response$result
+
+  colnames(result$bids) <- c("price", "size")
+  colnames(result$asks) <- c("price", "size")
+  
+  bids <- as_tibble(result$bids) %>% 
+    mutate(name = "bids")
+  asks <- as_tibble(result$asks) %>% 
+    mutate(name = "asks")
+  df <- rbind(bids, asks)
+  
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -270,41 +352,31 @@ ftx_orderbook <- function(key, secret, ..., market = NA, depth = 5) {
 
 #' @title FTX Trades
 #' @description Returns the trades that have taken place for a particular market
-#' @param key A client's key
-#' @param secret A client's secret
+#' @param key A client's key (deprecated)
+#' @param secret A client's secret (deprecated)
 #' @param market Name of market
 #' @param ... Additional parameters to pass to API request
-#' @param start_time Optional parameter. POSIXct value from when to extract trades.
-#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.
+#' @param start_time Optional parameter. POSIXct value from when to extract trades. Default value end_value - 5 minutes.
+#' @param end_time Optional parameter. POSIXct value up-to when to extract trades.Default value is current time.
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_trades(key="", secret="", market = "1INCH/USD")
+#' @examples ftx_trades(market = "1INCH/USD")
 #' @export
 
 ftx_trades <- function(key, secret, market, ..., start_time = NA, end_time = NA, tz = "GMT") {
+  
+  if (!missing(key) || !missing(secret)) {
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
+  }
   # GET /markets/{market}/trades
   # add optional parameters
-  path = paste0('/api/markets/', market, '/trades')
   
-  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
-    if(start_time > end_time){
-      logerror(msg = 'Start date cannot be after end date.')
-    }
-  }
+  path = paste0('api/markets/', market, '/trades')
   
-  query_list <- list()
-  
-  if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.integer(start_time)
-  }
-  if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.integer(end_time)
-  }
-  
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, 
-                              query = query_list, ...)
+  times <- start_end_time(start_time = start_time, end_time = end_time, delta = lubridate::minutes(5))
+  response <- ftx_httr_get(glue::glue("{base_url}/{path}?start_time={times$start_time %>% as.numeric() %>% as.integer()}&end_time={times$end_time %>% as.numeric() %>% as.integer()}")) 
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -321,8 +393,8 @@ ftx_trades <- function(key, secret, market, ..., start_time = NA, end_time = NA,
 
 #' @title FTX Historical Prices
 #' @description Returns historical prices of expired futures
-#' @param key A client's key
-#' @param secret A client's secret
+#' @param key A client's key (deprecated)
+#' @param secret A client's secret (deprecated)
 #' @param market Name of market
 #' @param ... Additional parameters to pass to API request
 #' @param resolution Window length in seconds. options: 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400
@@ -332,10 +404,13 @@ ftx_trades <- function(key, secret, market, ..., start_time = NA, end_time = NA,
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_historical_prices(key="", secret="", market = "1INCH/USD")
+#' @examples ftx_historical_prices(market = "1INCH/USD")
 #' @export
 
 ftx_historical_prices <- function(key, secret, market, ..., resolution = 14400, start_time = NA, end_time = NA, tz = "GMT") {
+  if (!missing(key) || !missing(secret)) {
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
+  }
   # GET /markets/{market}/candles?resolution={resolution}&start_time={start_time}&end_time={end_time}
   # check if resolution, start_time and end_time are correct and not contradictory, log error if not
   # check resolution parameter
@@ -345,27 +420,11 @@ ftx_historical_prices <- function(key, secret, market, ..., resolution = 14400, 
              3600, 14400, 86400, or any multiple of 86400 up to 30*86400')
     return(list(success = F, failure_reason = 'Unsupported candle resolution value. Supported values are 15, 60, 300, 900, 3600, 14400, 86400, or any multiple of 86400 up to 30*86400', data = NULL))
   }
+
+  path = paste0('api/markets/', market, '/candles?resolution=', resolution)
   
-  # check start and end times
-  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
-    if(start_time > end_time){
-      logerror(msg = 'Start date cannot be after end date.')
-    }
-  }
-  
-  path = paste0('/api/markets/', market, '/candles?resolution=', resolution)
-  
-  query_list <- list()
-  
-  if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.integer(start_time)
-  }
-  if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.integer(end_time)
-  }
-  
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL,
-                              query = query_list, ...)
+  times <- start_end_time(start_time = start_time, end_time = end_time, delta = lubridate::days(5))
+  response <- ftx_httr_get(glue::glue("{base_url}/{path}&start_time={times$start_time %>% as.numeric() %>% as.integer()}&end_time={times$end_time %>% as.numeric() %>% as.integer()}")) 
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -385,34 +444,37 @@ ftx_historical_prices <- function(key, secret, market, ..., resolution = 14400, 
 
 #' @title FTX Future Markets
 #' @description Returns all types of futures on FTX
-#' @param key A client's key
-#' @param secret A client's secret
-#' @param ... Additional parameters to pass to API request
+#' @param key A client's key (deprecated)
+#' @param secret A client's secret (deprecated)
+#' @param ... Additional parameters to pass to API request (deprecated)
 #' @param market Name of market
 #' @param tz Timezone to display times in. Default is GMT.
 #' @return A list of three elements: a logical vector success: FALSE/TRUE, 
 #' failure_reason: reason for failure if success is FALSE, NA otherwise, 
 #' data: a tibble containing the data if success is TRUE
-#' @examples ftx_future_markets(key="", secret="")
+#' @examples 
+#' ftx_future_markets()
+#' ftx_future_markets(market = "SOL-PERP")
 #' @export
 
 ftx_future_markets <- function(key, secret, ..., market = NA, tz = "GMT") {
   # GET /futures (if market == NA)
   # GET /futures/{market} (if market != NA)
-  path = paste0('/api/futures')
+  if (!missing(key) || !missing(secret)) {
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
+  }
+  path = paste0('api/futures')
   if(!is.na(market)){
     path = paste0(path, '/', market)
   }
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, query = NULL, ...)
+  
+  response <- ftx_httr_get(glue::glue("{base_url}/{path}")) 
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
   
   df <- result_formatter(result, "expiry", tz)
   
-  if(!is.na(market) & length(market) == 1){
-    df <- format_helper(result, "expiry", tz)
-  }
   return_obj <- list(
     success = response$success,
     failure_reason = ifelse(response$success, NA, response$error),
@@ -435,12 +497,14 @@ ftx_future_markets <- function(key, secret, ..., market = NA, tz = "GMT") {
 #' @export
 
 ftx_future_stat <-  function(key, secret, market, ..., tz = "GMT") {
+  if (!missing(key) || !missing(secret)) {
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
+  }
   # GET /futures/{market}/stats
 
-  path = paste0('/api/futures/', market, '/stats')
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL, query = NULL, ...)
+  path = paste0('api/futures/', market, '/stats')
+  response = ftx_httr_get(glue::glue("{base_url}/{path}"))
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
-  
   result = response$result
   
   df <- format_helper(result, "nextFundingTime", tz)
@@ -455,8 +519,8 @@ ftx_future_stat <-  function(key, secret, market, ..., tz = "GMT") {
 
 #' @title FTX Future Funding Rates
 #' @description Returns the funding rates of futures
-#' @param key A client's key
-#' @param secret A client's secret
+#' @param key A client's key (deprecated)
+#' @param secret A client's secret (deprecated)
 #' @param ... Additional parameters to pass to API request
 #' @param markets Vector of names of markets. 
 #' @param start_time POSIXct value from when to extract trades.
@@ -470,25 +534,15 @@ ftx_future_stat <-  function(key, secret, market, ..., tz = "GMT") {
 
 ftx_future_funding_rates <-  function(key, secret, ..., markets=c(), start_time=NA, end_time=NA, tz = "GMT") {
   # GET /funding_rates
-  # checks on start and end times
-  if(!missing(start_time) & !is.na(start_time) & !missing(end_time) & !is.na(end_time)){
-    if(start_time > end_time){
-      logerror(msg = 'Start date cannot be after end date.')
-    }
-  }
-  path = '/api/funding_rates'
-  
-  query_list <- list()
-  
-  if(!missing(start_time) & !is.na(start_time)){
-    query_list['start_time'] <- as.integer(start_time)
-  }
-  if(!missing(end_time) & !is.na(end_time)){
-    query_list['end_time'] <- as.integer(end_time)
+  if (!missing(key) || !missing(secret)) {
+    warning("arguments key and secret are deprecated, will be removed in version 0.2.0")
   }
   
-  response = ftx_send_request(method = "GET", path = path, key, secret, subaccount = NA, body = NULL,
-                              query = query_list, ...)
+  path = 'api/funding_rates'
+
+  times <- start_end_time(start_time = start_time, end_time = end_time, delta = lubridate::days(5))
+  response <- ftx_httr_get(glue::glue("{base_url}/{path}?start_time={times$start_time %>% as.numeric() %>% as.integer()}&end_time={times$end_time %>% as.numeric() %>% as.integer()}")) 
+  
   if(!response$success) return(list(success = F, failure_reason = response$error, data = NULL))
   
   result = response$result
@@ -1100,5 +1154,84 @@ ftx_my_spot_borrow_history <- function(key, secret, subaccount, ..., start_time=
     data = df
   )
   return(return_obj)
+}
+
+#'  FTX Get Multiple Markets
+#' 
+#' @description Get market data for multipole FTX markets.
+#'
+#' @param markets name of the markets (vector of string)
+#' @param resolution representing aggregation length in seconds (int)
+#' @param start_time human readable start time in UTC (string)
+#' @param end_time human readable end time in UTC (string)
+#'
+#' @return dataframe of prices if API call was successful
+#' @export
+#'
+#' @examples
+#' ftx_get_multiple_markets(c("BTC-PERP", "ETH-PERP"), 
+#'                          resolution = 86400, 
+#'                          start_time = "2019-07-20", 
+#'                          end_time = "2022-06-30")
+ftx_get_multiple_markets <- function(markets, resolution = 86400, start_time = "2019-07-20", end_time = "2022-06-30") {
+  start_time <- as.numeric(as.POSIXct(start_time, tz = "UTC"))
+  end_time <- as.numeric(as.POSIXct(end_time, tz = "UTC"))
+  prices <- data.frame()
+  for(market in markets) {
+    # these_prices <- get_single_ftx_market(market, resolution = resolution, start_time = start_time, end_time = end_time)
+    these_prices <- ftx_historical_prices(market = market, resolution = resolution, start_time = start_time, end_time = end_time)$data
+    if(!is.null(these_prices)) {
+      these_prices <- these_prices %>% 
+        dplyr::mutate(ticker = market)
+      
+      prices <- dplyr::bind_rows(prices, these_prices)
+    } else {
+      logwarn(glue::glue("Failed to get data for market {market}"))
+    }
+  }
+  prices
+}
+
+#'  FTX Get Hourly Markets
+#' 
+#' @description Get hourly resolution historical data of multiple FTX markets
+#'
+#' @param markets name of the markets (vector of string)
+#' @param start_date human readable start date in UTC (string)
+#' @param end_date human readable end date in UTC (string)
+#'
+#' @return dataframe of prices if API call was successful
+#' @export
+#'
+#' @examples
+#' ftx_get_hourly_markets(c("BTC-PERP", "ETH-PERP"), 
+#'                        start_date = "2019-07-20", end_date = "2022-06-30")
+#' 
+ftx_get_hourly_markets <- function(markets, 
+                                   start_date = "2019-07-27", 
+                                   end_date = as.character(Sys.Date())) {
+  if (as.Date(end_date) %>% lubridate::month() -  as.Date(start_date) %>% lubridate::month() >= 2) {
+    months <- c(as.Date(start_date), 
+                seq(from = as.Date(start_date) %>% lubridate::ceiling_date(unit = "month"), 
+                    to = as.Date(end_date) %>% lubridate::floor_date(unit = "month"),  
+                    by = "month"), 
+                as.Date(end_date) + lubridate::days(1) - lubridate::hours(1)) %>% 
+      tibble::as_tibble(months) %>% 
+      dplyr::mutate(end = dplyr::lead(.data$value)) %>% 
+      dplyr::select(begin = .data$value, .data$end) %>% 
+      stats::na.omit()
+  } else {
+    months <- tibble(begin = as.Date(start_date), end = as.Date(end_date) + lubridate::days(1) - lubridate::hours(1))
+  }
+
+  prices <- apply(months, 1, function(x) {
+    ftx_get_multiple_markets(markets, resolution = 3600, start_time = x[1], end_time = x[2])
+  } )
+  prices <- prices %>% 
+    dplyr::bind_rows() %>% 
+    dplyr::distinct()
+  prices <- prices %>% 
+    dplyr::select(ticker = .data$ticker, date = .data$start_time, open, high, low, close, volume)
+  prices
 }
 

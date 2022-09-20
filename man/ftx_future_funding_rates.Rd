@@ -15,9 +15,9 @@ ftx_future_funding_rates(
 )
 }
 \arguments{
-\item{key}{A client's key}
+\item{key}{A client's key (deprecated)}
 
-\item{secret}{A client's secret}
+\item{secret}{A client's secret (deprecated)}
 
 \item{...}{Additional parameters to pass to API request}
 

@@ -22,8 +22,6 @@ The goal of rFTX is to provide R interface for FTX REST API. The user is require
 
 ## Installation
 
-rFTX package is not yet on CRAN but it will soon be.
-
 You can install the development version from [GitHub](https://github.com/) with:
 
 ``` {r}

@@ -15,8 +15,6 @@ subaccounts.
 
 ## Installation
 
-rFTX package is not yet on CRAN but it will soon be.
-
 You can install the development version from
 [GitHub](https://github.com/) with:
 

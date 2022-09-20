@@ -16,9 +16,9 @@ ftx_historical_prices(
 )
 }
 \arguments{
-\item{key}{A client's key}
+\item{key}{A client's key (deprecated)}
 
-\item{secret}{A client's secret}
+\item{secret}{A client's secret (deprecated)}
 
 \item{market}{Name of market}
 
@@ -41,5 +41,5 @@ data: a tibble containing the data if success is TRUE
 Returns historical prices of expired futures
 }
 \examples{
-ftx_historical_prices(key="", secret="", market = "1INCH/USD")
+ftx_historical_prices(market = "1INCH/USD")
 }
