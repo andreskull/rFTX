@@ -10,17 +10,17 @@ Description: R implementation of FTX REST API.
 Depends:
     R (>= 3.4)
 Imports:
-    digest (>= 0.6.28),
+    digest (>= 0.6.29),
     jsonlite (>= 1.8.0),
-    dplyr (>= 1.0.7),
+    dplyr (>= 1.0.9),
     magrittr (>= 2.0.3),
     lubridate (>= 1.8.0),
     logging (>= 0.10-108), 
-    httr (>= 1.4.3),
-    tibble (>= 3.1.6),
+    httr (>= 1.4.4),
+    tibble (>= 3.1.8),
     purrr (>= 0.3.4),
-    rlang (>= 1.0.2),
-    utils (>= 4.1.2),
+    rlang (>= 1.0.5),
+    utils (>= 4.2.1),
     glue (>= 1.6.2)
 License: MIT + file LICENSE
 Encoding: UTF-8
