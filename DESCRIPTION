@@ -1,7 +1,7 @@
 Package: rFTX
 Type: Package
 Title: R package for FTX API
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     c(person("Andres", "Kull", email = "andres.a.kull@gmail.com",role = c("aut", "cre")),
     person("Pauline", "Developer", role = "ctb", email = "paunimo@gmail.com"))
@@ -20,7 +20,8 @@ Imports:
     tibble (>= 3.1.8),
     purrr (>= 0.3.4),
     rlang (>= 1.0.5),
-    glue (>= 1.6.2)
+    glue (>= 1.6.2),
+    data.table (>= 1.14.2)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
