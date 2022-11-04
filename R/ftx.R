@@ -7,6 +7,7 @@
 #' @importFrom purrr set_names map_df map
 #' @importFrom rlang := 
 #' @importFrom rlang .data
+#' @importFrom data.table data.table
 #' 
 
 utils::globalVariables(c(".", "total", "account", "future", "startTime", "high", "low", "volume", "market", "size", "base_url"))
@@ -1210,6 +1211,7 @@ ftx_get_multiple_markets <- function(markets, resolution = 86400, start_time = "
 ftx_get_hourly_markets <- function(markets, 
                                    start_date = "2019-07-27", 
                                    end_date = as.character(Sys.Date())) {
+  warning("The function is deprecated, will be removed in version 0.2.0. Use ftx_get_markets_history() instead")
   if (as.Date(end_date) %>% lubridate::month() -  as.Date(start_date) %>% lubridate::month() >= 2) {
     months <- c(as.Date(start_date), 
                 seq(from = as.Date(start_date) %>% lubridate::ceiling_date(unit = "month"), 
@@ -1233,5 +1235,76 @@ ftx_get_hourly_markets <- function(markets,
   prices <- prices %>% 
     dplyr::select(ticker = .data$ticker, date = .data$start_time, open, high, low, close, volume)
   prices
+}
+
+#'  FTX Get History All
+#' 
+#' @description Get historical data of multiple FTX markets 
+#'
+#' @param markets name of the markets (vector of string)
+#' @param resolution resolution of candles in seconds (60, 300, 900, 3600, 14400, 86400)
+#' @param start_date human readable start date in UTC (string)
+#' @param end_date human readable end date in UTC (string)
+#'
+#' @return dataframe of prices if API call was successful
+#' @export
+#'
+#' @examples
+#' ftx_get_markets_history(c("BTC-PERP", "ETH-PERP"), resolution = 300,
+#'                        start_date = "2022-07-20", end_date = "2022-07-30")
+#' 
+
+ftx_get_markets_history <- function(markets, resolution, start_date, end_date) {
+  
+  start_date <- as.Date(start_date)
+  end_date <- as.Date(end_date)
+  # ftx rest api return only 1500 candles in one request
+  # 1500 daily candles -> 1500 days (86400)
+  # 1500 4 hour candles -> 250 days (14400)
+  # 1500 hourly candles -> 62.5 days (3600)
+  # 1500 15 min candles -> 15.625 days (900)
+  # 1500 5 min candles -> 5.2 days (300)
+  # 1500 1 min candles -> 1.04 days (60)
+  
+  res_values <- c(60, 300, 900, 3600, 14400, 86400)
+  
+  if(resolution %in% res_values & start_date < end_date){
+    delta <- ifelse(as.integer(resolution) == 60, 1, 
+                    ifelse(as.integer(resolution) == 300, 5, 
+                           ifelse(as.integer(resolution) == 900, 15, 
+                                  ifelse(as.integer(resolution) == 3600, 62, 
+                                         ifelse(as.integer(resolution) == 14400, 250, 
+                                                ifelse(as.integer(resolution) == 86400, 1500, F))))))
+    
+    if(delta != F){
+      dates <- seq(from = as.Date(start_date), to = as.Date(end_date), delta)
+      if(length(dates) > 1){
+        tb <- NULL
+        for (i in 2:length(dates)) {
+          q <- data.table::data.table(from = dates[i-1], to = dates[i])
+          tb <- rbind(tb, q)
+        }
+      } else {
+        tb = data.table::data.table(from = start_date, to = end_date)
+      }
+      
+      if(tb$to[nrow(tb)] != end_date){
+        last_row <- data.table::data.table(from = tb$to[nrow(tb)], to = end_date)
+        tb <- rbind(tb, last_row)
+      } else tb = tb
+    }
+    
+    prices <- apply(tb, 1, function(x) {
+      ftx_get_multiple_markets(markets, resolution, start_time = x[1], end_time = x[2])
+    } )
+    prices <- prices %>% 
+      dplyr::bind_rows() %>% 
+      dplyr::distinct()
+    prices <- prices %>% 
+      dplyr::select(ticker = .data$ticker, date = .data$start_time, open, high, low, close, volume)
+    prices
+  }else{
+    logerror(msg = 'Unsupported candle resolution value. Supported values are 15, 60, 300, 900, 3600, 14400, 86400 or start date >= end date')
+  }
 }
 
